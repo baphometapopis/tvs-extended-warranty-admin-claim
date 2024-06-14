@@ -201,7 +201,7 @@ if(response?.status===200){
       </button> */}
 
 
-     {/* <TopClaimParts topParts={top5PartsforClaim} filteredParts={top5PartsforClaimFiltered} appliedFiltered={top5PartsforClaimappliedFilter}/> */}
+     <TopClaimParts topParts={top5PartsforClaim} filteredParts={top5PartsforClaimFiltered} appliedFiltered={top5PartsforClaimappliedFilter}/>
 
             </div>        </div>
     );
