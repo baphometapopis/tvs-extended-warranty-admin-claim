@@ -1,0 +1,144 @@
+// Dashboard.js
+
+import React, { useEffect, useState, useRef } from 'react';
+import Chart from 'chart.js/auto';
+import './DashboardPage.css';
+
+const Dashboard = () => {
+    const [chartData, setChartData] = useState(null);
+    const claimsChartRef = useRef(null);
+    const topPartsChartRef = useRef(null);
+
+    useEffect(() => {
+        // Simulated data
+        const data = {
+            totalClaims: 1000,
+            approvedClaims: 800,
+            rejectedClaims: 200,
+            totalSoldPolicy: 500,
+            averageClaimCountTAT: 5, // For demonstration, replace with actual calculation
+            averageClaimSize: 2000, // For demonstration, replace with actual calculation
+            topParts: [
+                { part: 'Engine', count: 150 },
+                { part: 'Transmission', count: 120 },
+                { part: 'Brakes', count: 100 },
+                { part: 'Suspension', count: 90 },
+                { part: 'Electrical', count: 80 }
+            ]
+        };
+
+        // Destroy previous charts
+        if (claimsChartRef.current) {
+            claimsChartRef.current.destroy();
+        }
+
+        if (topPartsChartRef.current) {
+            topPartsChartRef.current.destroy();
+        }
+
+        // Create charts
+        const ctx1 = document.getElementById('claimsChart');
+        const ctx2 = document.getElementById('topPartsChart');
+
+        claimsChartRef.current = new Chart(ctx1, {
+            type: 'bar',
+            data: {
+                labels: ['Total Claims', 'Approved Claims', 'Rejected Claims', 'Total Sold Policy'],
+                datasets: [{
+                    label: 'Claims Overview',
+                    data: [data.totalClaims, data.approvedClaims, data.rejectedClaims, data.totalSoldPolicy],
+                    backgroundColor: [
+                        'rgba(255, 99, 132, 0.6)',
+                        'rgba(54, 162, 235, 0.6)',
+                        'rgba(255, 206, 86, 0.6)',
+                        'rgba(75, 192, 192, 0.6)'
+                    ],
+                    borderColor: [
+                        'rgba(255, 99, 132, 1)',
+                        'rgba(54, 162, 235, 1)',
+                        'rgba(255, 206, 86, 1)',
+                        'rgba(75, 192, 192, 1)'
+                    ],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+
+        topPartsChartRef.current = new Chart(ctx2, {
+            type: 'bar',
+            data: {
+                labels: data.topParts.map(part => part.part),
+                datasets: [{
+                    label: 'Top 5 Parts for Claims (India)',
+                    data: data.topParts.map(part => part.count),
+                    backgroundColor: [
+                        'rgba(255, 99, 132, 0.6)',
+                        'rgba(54, 162, 235, 0.6)',
+                        'rgba(255, 206, 86, 0.6)',
+                        'rgba(75, 192, 192, 0.6)',
+                        'rgba(153, 102, 255, 0.6)'
+                    ],
+                    borderColor: [
+                        'rgba(255, 99, 132, 1)',
+                        'rgba(54, 162, 235, 1)',
+                        'rgba(255, 206, 86, 1)',
+                        'rgba(75, 192, 192, 1)',
+                        'rgba(153, 102, 255, 1)'
+                    ],
+                    borderWidth: 1
+                }]
+            }
+        });
+
+        setChartData(data);
+
+        // Cleanup function
+        return () => {
+            if (claimsChartRef.current) {
+                claimsChartRef.current.destroy();
+            }
+            if (topPartsChartRef.current) {
+                topPartsChartRef.current.destroy();
+            }
+        };
+    }, []);
+
+    return (
+        <div className="dashboard-container">
+              <div className="stats-container">
+              <div className="stat">
+                    <h3>Total  Claims</h3>
+                    <p>{chartData && chartData.rejectedClaims}</p>
+                </div>
+                <div className="stat">
+                    <h3>Total Accepted Claims</h3>
+                    <p>{chartData && chartData.approvedClaims}</p>
+                </div>
+                <div className="stat">
+                    <h3>Total Rejected Claims</h3>
+                    <p>{chartData && chartData.rejectedClaims}</p>
+                </div>
+            </div>
+            <div className="chart-container">
+                <div className="chart">
+                    <canvas id="claimsChart"></canvas>
+                </div>
+            </div>
+            <div className="chart-container">
+                <div className="chart">
+                    <canvas id="topPartsChart"></canvas>
+                </div>
+            </div>
+        
+        </div>
+    );
+}
+
+export default Dashboard;

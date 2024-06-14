@@ -1,0 +1,52 @@
+/* Sidebar.css */
+
+@import url('../../Color.css');
+
+.sidebar {
+    width: 180px;
+    height: 95.8%;
+    background-color: var(--Sidebar_Color);
+    color: #fff;
+    padding: 20px;
+    transition: transform 0.3s ease;
+    transform: translateX(-100%);
+  }
+  
+  .sidebar.open {
+    transform: translateX(0);
+  }
+  .menu-icon{
+    height: 25px;
+    width: 25px;
+    margin-right: 10px;
+  }
+  
+  .sidebar-menu {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+  
+  .menu-item {
+    padding: 10px 0;
+    border-bottom: 1px solid #555;
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+  }
+  
+  .menu-item:last-child {
+    border-bottom: none;
+  }
+  
+  .menu-item:hover {
+    background-color: #555;
+  }
+  
+  
+  @media (max-width: 768px) {
+    .sidebar {
+      /* width: 100%; Make sidebar full width */
+      padding: 10px; /* Reduce padding */
+      position: absolute;
+    }}

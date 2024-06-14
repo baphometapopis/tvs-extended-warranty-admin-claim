@@ -1,0 +1,65 @@
+@keyframes stackDown {
+    from {
+        transform: translateY(-20px);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+.card-container {
+    perspective: 1000px; /* Define the perspective for 3D effect */
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    width: 100%;
+    animation: stackDown 1s ease forwards;
+
+}
+
+.card {
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    padding: 20px;
+    display: flex;
+    background-color: #f9f9f9;
+    width: 100%;
+    margin-top: 10px;
+    justify-content: space-between;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    transition: transform 0.5s; /* Add transition for smooth animation */
+}
+
+.flip {
+    transform: rotateX(360deg); /* Rotate the card 360 degrees */
+    transition: transform 1s ease; /* Adjust the transition duration and timing function */
+
+}
+
+.card p {
+    margin: 0;
+    padding: 5px 0;
+}
+
+.part-name {
+    margin-bottom: 5px; /* Adjust as needed */
+    color: var(--Sidebar_Color);
+}
+
+.claim-count {
+    margin-top: 5px; /* Adjust as needed */
+    color: var(--Sidebar_Color);
+
+}
+
+/* Additional styles for the back side of the card */
+.card .back {
+    display: none;
+    transform: rotateX(180deg); /* Initially hide the back side of the card */
+}
+
+.card .back p {
+    color: red; /* Customize the color of text on the back side */
+}

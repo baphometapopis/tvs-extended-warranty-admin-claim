@@ -1,0 +1,24 @@
+.ReportContainer{
+    background-color:var(--BACKGROUND_COLOR);
+    height: 100%;
+
+}.ExcelTable2007 {
+    width: 100%;
+    border-collapse: collapse;
+  }
+  
+  .ExcelTable2007 td,
+  .ExcelTable2007 th {
+    border: 1px solid #dddddd;
+    padding: 8px;
+  }
+  
+  .ExcelTable2007 th {
+    text-align: left;
+    background-color: #f2f2f2;
+  }
+  
+  .heading {
+    font-weight: bold;
+  }
+  

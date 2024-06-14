@@ -1,0 +1,88 @@
+.ClaimViewContainer {
+  background-color: white;
+  height: 100%;
+}
+
+.Tabs {
+  display: flex;
+  /* border-bottom: 1px solid #ccc; */
+  margin-bottom: 20px;
+  background-color: var(--Sidebar_Color);
+  justify-content: space-between;
+  border-bottom-right-radius:5px ;
+  border-bottom-left-radius:5px ;
+
+}
+
+.Tabs button {
+  flex: 1; /* This ensures the buttons take up equal width */
+
+  padding: 10px 20px;
+  width: 100%;
+  cursor: pointer;
+  border: none;
+  background: none;
+  outline: none;
+  font-size: 16px;
+}
+
+.Tabs button.active {
+  border-top: 1px solid #000;
+  font-weight: bold;
+  background-color: var(--BACKGROUND_COLOR);
+  color: var(--Sidebar_Color);
+
+}
+
+.ClaimForm, .ClaimEstimation, .UpdateStatus {
+  padding: 20px;
+}
+
+.TextInputRow {
+  display: flex;
+  gap: 30px; /* Adjust the gap between the inputs as needed */
+  margin-bottom: 10px; /* Adjust the bottom margin between rows as needed */
+}
+
+.TextInputRow > * {
+  flex: 1;
+}
+
+.TextInputRow .empty {
+  flex: 1; /* Ensure the empty div takes the same space as the other inputs */
+}
+.EstimationHeader {
+  display: flex;
+  font-weight: bold;
+  margin-bottom: 10px;
+}
+
+.HeaderItem {
+  flex: 1;
+  padding: 10px;
+  text-align: center;
+  border-bottom: 2px solid #000;
+}
+
+.EstimationRow {
+  position: relative;
+  display: flex;
+  gap: 10px;
+  margin-bottom: 10px;
+  background-color: whitesmoke;
+  padding-top: 20px;
+  padding-right: 10px;
+  padding-left: 10px;
+
+  justify-content: center;
+}
+
+.EstimationRow > :not(img) {
+  flex: 1;
+}
+
+.PlainText {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
