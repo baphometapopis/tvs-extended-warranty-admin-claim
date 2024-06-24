@@ -77,18 +77,13 @@ const [formData, setFormData] = useState({
 
 
 // const ogEstimation =[
-//   { id: 1, part_description: 'part1', hsn_code: 'HSN001', unit_price: '250', qty: '2', tax_rate: '3%', total_mrp: '1212',model:'Apache' },
-//   { id: 2, part_description: 'part2', hsn_code: 'HSN002', unit_price: '250', qty: '2', tax_rate: '3%', total_mrp: '12',model:'Apache' },
-//   { id: 3, part_description: 'part3', hsn_code: 'HSN003', unit_price: '250', qty: '2', tax_rate: '3%', total_mrp: '21212',model:'Apache' },
-//   { id: 4, part_description: 'part4', hsn_code: 'HSN004', unit_price: '250', qty: '2', tax_rate: '3%', total_mrp: '342',model:'Apache' },
+//   { id: 1, part_description: 'part1', hsn_code: 'HSN001', repair_mrp: '250', qty: '2', repair_tax_rate: '3%', total_mrp: '1212',model:'Apache' },
+//   { id: 2, part_description: 'part2', hsn_code: 'HSN002', repair_mrp: '250', qty: '2', repair_tax_rate: '3%', total_mrp: '12',model:'Apache' },
+//   { id: 3, part_description: 'part3', hsn_code: 'HSN003', repair_mrp: '250', qty: '2', repair_tax_rate: '3%', total_mrp: '21212',model:'Apache' },
+//   { id: 4, part_description: 'part4', hsn_code: 'HSN004', repair_mrp: '250', qty: '2', repair_tax_rate: '3%', total_mrp: '342',model:'Apache' },
 // ]
 
-  const [estimations, setEstimations] = useState([
-    { id: 1, part_description: 'part1', hsn_code: 'HSN001', unit_price: '250', qty: '2', tax_rate: '3%', total_mrp: '1212' ,model:'Apache'},
-    { id: 2, part_description: 'part2', hsn_code: 'HSN002', unit_price: '250', qty: '2', tax_rate: '3%', total_mrp: '12',model:'Apache' },
-    { id: 3, part_description: 'part3', hsn_code: 'HSN003', unit_price: '250', qty: '2', tax_rate: '3%', total_mrp: '21212',model:'Apache' },
-    { id: 4, part_description: 'part4', hsn_code: 'HSN004', unit_price: '250', qty: '2', tax_rate: '3%', total_mrp: '342',model:'Apache' },
-  ]);
+  const [estimations, setEstimations] = useState([]);
   const [formErrors, setFormErrors] = useState({
     proposal_no: '',
     // Add other claim_details error fields here
@@ -575,7 +570,7 @@ useEffect(()=>{getClaimData()},[])
             <div className='HeaderItem'>HSN CODE</div>
             <div className='HeaderItem'>Model</div>
 
-            <div className='HeaderItem'>Unit Price</div>
+            <div className='HeaderItem'>Repair Price</div>
             <div className='HeaderItem'>GST</div>
             <div className='HeaderItem'>Total</div>
 {isEditing!==null && <div className='HeaderItem'>Action</div>}
@@ -603,20 +598,20 @@ useEffect(()=>{getClaimData()},[])
                     isDisabled={false}
                   />
                   <TextInput
-                    name="unit_price"
-                    value={estimation.unit_price}
-                    onChange={(e) => handleChange(e, 'unit_price', index)}
-                    placeholder="Enter Unit Price"
-                    error={formErrors.unit_price}
+                    name="repair_mrp"
+                    value={estimation.repair_mrp}
+                    onChange={(e) => handleChange(e, 'repair_mrp', index)}
+                    placeholder="Enter Repair Price"
+                    error={formErrors.repair_mrp}
                     isDisabled={false}
                   />
                 
                   <TextInput
-                    name="tax_rate"
-                    value={estimation.tax_rate}
-                    onChange={(e) => handleChange(e, 'tax_rate', index)}
+                    name="repair_tax_rate"
+                    value={estimation.repair_tax_rate}
+                    onChange={(e) => handleChange(e, 'repair_tax_rate', index)}
                     placeholder="Enter GST"
-                    error={formErrors.tax_rate}
+                    error={formErrors.repair_tax_rate}
                     isDisabled={false}
                   />
                   <TextInput
@@ -650,20 +645,20 @@ useEffect(()=>{getClaimData()},[])
                     isDisabled={true}
                   />
                   <TextInput
-                    name="unit_price"
-                    value={estimation.unit_price}
-                    onChange={(e) => handleChange(e, 'unit_price', index)}
-                    placeholder="Enter Unit Price"
-                    error={formErrors.unit_price}
+                    name="repair_mrp"
+                    value={estimation.repair_mrp}
+                    onChange={(e) => handleChange(e, 'repair_mrp', index)}
+                    placeholder="Enter Repair Price"
+                    error={formErrors.repair_mrp}
                     isDisabled={true}
                   />
                 
                   <TextInput
-                    name="tax_rate"
-                    value={estimation.tax_rate}
-                    onChange={(e) => handleChange(e, 'tax_rate', index)}
+                    name="repair_tax_rate"
+                    value={estimation.repair_tax_rate}
+                    onChange={(e) => handleChange(e, 'repair_tax_rate', index)}
                     placeholder="Enter GST"
-                    error={formErrors.tax_rate}
+                    error={formErrors.repair_tax_rate}
                     isDisabled={true}
                   />
                   <TextInput
@@ -725,11 +720,11 @@ useEffect(()=>{getClaimData()},[])
                   />
                   <div className='PlainText'>{editedEstimations.hsn_code}</div>
                   <TextInput
-                    name="unit_price"
-                    value={editedEstimations.unit_price}
-                    onChange={(e) => handleChange(e, 'unit_price', index)}
-                    placeholder="Enter Unit Price"
-                    error={formErrors.unit_price}
+                    name="repair_mrp"
+                    value={editedEstimations.repair_mrp}
+                    onChange={(e) => handleChange(e, 'repair_mrp', index)}
+                    placeholder="Enter Repair Price"
+                    error={formErrors.repair_mrp}
                     isDisabled={true}
                   />
                   <TextInput
@@ -741,11 +736,11 @@ useEffect(()=>{getClaimData()},[])
                     isDisabled={true}
                   />
                   <TextInput
-                    name="tax_rate"
-                    value={editedEstimations.tax_rate}
-                    onChange={(e) => handleChange(e, 'tax_rate', index)}
+                    name="repair_tax_rate"
+                    value={editedEstimations.repair_tax_rate}
+                    onChange={(e) => handleChange(e, 'repair_tax_rate', index)}
                     placeholder="Enter GST"
-                    error={formErrors.tax_rate}
+                    error={formErrors.repair_tax_rate}
                     isDisabled={true}
                   />
                   <TextInput
