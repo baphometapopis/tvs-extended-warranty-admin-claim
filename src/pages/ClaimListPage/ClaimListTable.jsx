@@ -177,7 +177,7 @@ const getVariable = (status) => {
       renderCell: (params) => (
         <div  style={{display:'flex',gap:'5px',justifyContent:'center'}}>
     {params?.row?.breakin_status!==0&& <img  onClick={()=>handleViewReports(params)}  style={{width:'30px',cursor:'pointer'}} src={ViewIcon} />}
-   <img  src={Downloadpdf} onClick={()=>console.log('Download PDF')} style={{width:'30px',cursor:'pointer'}}  />
+   {/* <img  src={Downloadpdf} onClick={()=>console.log('Download PDF')} style={{width:'30px',cursor:'pointer'}}  /> */}
 
         </div>
       ), // Pass policy_no or id to PolicyCard

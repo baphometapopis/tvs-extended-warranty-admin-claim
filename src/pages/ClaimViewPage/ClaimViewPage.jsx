@@ -77,13 +77,18 @@ const [formData, setFormData] = useState({
 
 
 // const ogEstimation =[
-//   { id: 1, category: 'part1', hsn_code: 'HSN001', unit_price: '250', qty: '2', tax_rate: '3%', total: '1212' },
-//   { id: 2, category: 'part2', hsn_code: 'HSN002', unit_price: '250', qty: '2', tax_rate: '3%', total: '12' },
-//   { id: 3, category: 'part3', hsn_code: 'HSN003', unit_price: '250', qty: '2', tax_rate: '3%', total: '21212' },
-//   { id: 4, category: 'part4', hsn_code: 'HSN004', unit_price: '250', qty: '2', tax_rate: '3%', total: '342' },
+//   { id: 1, part_description: 'part1', hsn_code: 'HSN001', unit_price: '250', qty: '2', tax_rate: '3%', total_mrp: '1212',model:'Apache' },
+//   { id: 2, part_description: 'part2', hsn_code: 'HSN002', unit_price: '250', qty: '2', tax_rate: '3%', total_mrp: '12',model:'Apache' },
+//   { id: 3, part_description: 'part3', hsn_code: 'HSN003', unit_price: '250', qty: '2', tax_rate: '3%', total_mrp: '21212',model:'Apache' },
+//   { id: 4, part_description: 'part4', hsn_code: 'HSN004', unit_price: '250', qty: '2', tax_rate: '3%', total_mrp: '342',model:'Apache' },
 // ]
 
-  const [estimations, setEstimations] = useState([]);
+  const [estimations, setEstimations] = useState([
+    { id: 1, part_description: 'part1', hsn_code: 'HSN001', unit_price: '250', qty: '2', tax_rate: '3%', total_mrp: '1212' ,model:'Apache'},
+    { id: 2, part_description: 'part2', hsn_code: 'HSN002', unit_price: '250', qty: '2', tax_rate: '3%', total_mrp: '12',model:'Apache' },
+    { id: 3, part_description: 'part3', hsn_code: 'HSN003', unit_price: '250', qty: '2', tax_rate: '3%', total_mrp: '21212',model:'Apache' },
+    { id: 4, part_description: 'part4', hsn_code: 'HSN004', unit_price: '250', qty: '2', tax_rate: '3%', total_mrp: '342',model:'Apache' },
+  ]);
   const [formErrors, setFormErrors] = useState({
     proposal_no: '',
     // Add other claim_details error fields here
@@ -615,11 +620,11 @@ useEffect(()=>{getClaimData()},[])
                     isDisabled={false}
                   />
                   <TextInput
-                    name="mrp"
-                    value={estimation.mrp}
-                    onChange={(e) => handleChange(e, 'mrp', index)}
+                    name="total_mrp"
+                    value={estimation.total_mrp}
+                    onChange={(e) => handleChange(e, 'total_mrp', index)}
                     placeholder="Enter Total"
-                    error={formErrors.mrp}
+                    error={formErrors.total_mrp}
                     isDisabled={false}
                   />
                   <button style={{backgroundColor:'green'}} onClick={() => handleUpdateClick(index,)}>Update</button>
@@ -662,11 +667,11 @@ useEffect(()=>{getClaimData()},[])
                     isDisabled={true}
                   />
                   <TextInput
-                    name="mrp"
-                    value={estimation.mrp}
-                    onChange={(e) => handleChange(e, 'mrp', index)}
+                    name="total_mrp"
+                    value={estimation.total_mrp}
+                    onChange={(e) => handleChange(e, 'total_mrp', index)}
                     placeholder="Enter Total"
-                    error={formErrors.mrp}
+                    error={formErrors.total_mrp}
                     isDisabled={true}
                   />
 <img onClick={() => handleEditClick(index)} src={EditIcon} style={{width:'25px',height:'25px',position:'absolute',right:5,top:0}}/>
@@ -744,11 +749,11 @@ useEffect(()=>{getClaimData()},[])
                     isDisabled={true}
                   />
                   <TextInput
-                    name="mrp"
-                    value={editedEstimations.mrp}
-                    onChange={(e) => handleChange(e, 'mrp', index)}
+                    name="total_mrp"
+                    value={editedEstimations.total_mrp}
+                    onChange={(e) => handleChange(e, 'total_mrp', index)}
                     placeholder="Enter Total"
-                    error={formErrors.mrp}
+                    error={formErrors.total_mrp}
                     isDisabled={true}
                   />
 <img onClick={() => handleCancelEdit(index)} src={CloseIcon} style={{width:'25px',height:'25px',position:'absolute',right:5,top:0}}/>
