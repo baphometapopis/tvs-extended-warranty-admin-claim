@@ -13,7 +13,6 @@ import { Base64 } from "js-base64";
 // import CancelModal from "./Modal/PolicyModal/CancelModal";
 
 const SoldPolicyListTable = ({ data, refresh }) => {
-    console.log(data,'>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>')
 
     const handleDownloadPdf = async (data) => {
     
@@ -52,7 +51,6 @@ const SoldPolicyListTable = ({ data, refresh }) => {
 
 
   const handleViewReports=(params)=>{
-    console.log(params?.row)
     navigate('/view-claim',{state:{
       data:params?.row
     }})
@@ -196,7 +194,7 @@ const getVariable = (status) => {
       width: 350,
       renderCell: (params) => (
         <div  style={{display:'flex',gap:'5px',justifyContent:'center'}}>
-    {params?.row?.breakin_status!==0&& <img  onClick={()=>handleViewReports(params)}  style={{width:'30px',cursor:'pointer'}} src={ViewIcon} />}
+    {/* {params?.row?.breakin_status!==0&& <img  onClick={()=>handleViewReports(params)}  style={{width:'30px',cursor:'pointer'}} src={ViewIcon} />} */}
    <img  src={Downloadpdf} onClick={()=>handleDownloadPdf(params.row)} style={{width:'30px',cursor:'pointer'}}  />
 
         </div>

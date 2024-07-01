@@ -15,8 +15,10 @@ import { Api_Endpoints } from '../../Api/apiEndpoint';
 import { SearchIcon } from '../../Constant/ImageConstant';
 import Dropdown from '../../components/UI/Dropdown';
 import FilterContainer from '../../components/FilterComponent/FilterContainer';
+import { showErrorToast, showSuccessToast } from '../../utils/toastService';
 
 const  ClaimListPage=()=> {
+  const [dropDownData,setdropDownData]=useState([])
 
   const [filterValue,setFilterValue]=useState({
      searchParam:'',productType:'',Status:''
@@ -227,6 +229,47 @@ const product=[
       "label": "Ecart rickshow(PCCV)"
   }
 ]
+
+const handleFilterChange = async (data) => {
+
+  try {
+
+    // Switch-case statement to select endpoint based on selected report
+   
+
+    let postData={
+
+      type:0,
+status:data?.status??'',
+startDate:data?.startDate??'',
+endDate:data?.endDate??'',
+searchTerm:data?.search??''
+    }
+    if (data) {
+      const response = await makeApiCall(Api_Endpoints.getClaimedPolicy, 'GET',postData);
+if(response?.status===200){
+  setPolicyList(response?.data?.data)
+
+if(response?.data?.data.length!==0){
+
+  showSuccessToast('No Record Found')
+
+  }
+
+}
+else{
+
+  showErrorToast(response?.message)
+}
+
+    } else {
+      console.log('Invalid report selected');
+    }
+  } catch (error) {
+    console.error('Error occurred while fetching data:', error);
+  }
+};
+
 const handleSearchChange = (event) => {
   
   setFilterValue(prevData=>({
@@ -248,8 +291,38 @@ const handleDropdownChange =(e,field)=>{
     ...prevData,[field]:selectedValue
   })) 
 }
+const fetchData=async()=>{
+  const getstatus =      await   makeApiCall(Api_Endpoints.getStatus, 'GET');
+  
+  if(getstatus?.status===200){
+    const dropdownData = [
+     
+      {
+        label: "status",
+        placeholder: 'Select Status',
+        options: getstatus.data?.map((data) => ({
+          value: data.status_id, // Assuming your API response contains a 'value' field
+          label: data.name // Assuming your API response contains a 'label' field
+        }))
+      },
+      // Add more dropdown objects as needed
+    ];
+  setdropDownData(dropdownData)
+  
+  
+  
+  }else
+  {
+    showErrorToast(getstatus?.message)
+  }
+  
+    }
 
-useEffect(()=>{console.log(policyList)},[filterValue,policyList])
+
+    useEffect(()=>{fetchData()},[])
+useEffect(()=>{
+
+},[filterValue,policyList])
 
 
 
@@ -264,10 +337,12 @@ useEffect(()=>{console.log(policyList)},[filterValue,policyList])
 
 
       <FilterContainer
+      dropdownData={dropDownData}
         handleSearchChange={handleSearchChange}
         handleDropdownChange={handleDropdownChange}
         handleReset={handleReset}
         product={product}
+        handleFilterChange={handleFilterChange}
         status={status}
       />
 
@@ -324,20 +399,20 @@ useEffect(()=>{console.log(policyList)},[filterValue,policyList])
                   Page {currentPage} of {totalPage}
                 </span>
   
-                <button
+                <p
   className='paginationbutton'
 onClick={() => handlePageChange(currentPage - 1)}
                   disabled={currentPage === 1}
                 >
                   Prev
-                </button>
-                <button
+                </p>
+                <p
                   className='paginationbutton'
                   onClick={() => handlePageChange(currentPage + 1)}
                   disabled={currentPage === totalPage}
                 >
                   Next
-                </button>
+                </p>
               </div>
             </div>
        

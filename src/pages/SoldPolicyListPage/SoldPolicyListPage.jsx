@@ -15,8 +15,10 @@ import { Api_Endpoints } from '../../Api/apiEndpoint';
 import { SearchIcon } from '../../Constant/ImageConstant';
 import Dropdown from '../../components/UI/Dropdown';
 import FilterContainer from '../../components/FilterComponent/FilterContainer';
+import { showErrorToast } from '../../utils/toastService';
 
 const  SoldPolicyListPage=()=> {
+  const [dropDownData,setdropDownData]=useState([])
 
   const [filterValue,setFilterValue]=useState({
      searchParam:'',productType:'',Status:''
@@ -174,60 +176,6 @@ const [windowWidth, setWindowWidth] = useState([window.innerWidth]);
     }, [indexOfLastRecord, indexOfFirstRecord]);
   
 
-const product=[
-  {
-      "id": 1,
-      "label": "Private Car"
-  },
-  {
-      "id": 2,
-      "label": "Two Wheeler"
-  },
-  {
-      "id": 3,
-      "label": "Commercial"
-  },
-  {
-      "id": 4,
-      "label": "Taxi (1-6)"
-  },
-  {
-      "id": 5,
-      "label": "Threewheeler"
-  },
-  {
-      "id": 7,
-      "label": "Bus PCCV"
-  },
-  {
-      "id": 8,
-      "label": "Threewheeler"
-  },
-  {
-      "id": 9,
-      "label": "Misc D"
-  },
-  {
-      "id": 10,
-      "label": "3 wheeler (GCCV)"
-  },
-  {
-      "id": 11,
-      "label": "3 wheeler(PCCV) 6-17 Seater"
-  },
-  {
-      "id": 12,
-      "label": "Rickshow(PCCV) 3-6 Seater"
-  },
-  {
-      "id": 13,
-      "label": "Ecart Rickshow(GCCV)"
-  },
-  {
-      "id": 14,
-      "label": "Ecart rickshow(PCCV)"
-  }
-]
 
 const handleSearchChange = (event) => {
   
@@ -249,8 +197,35 @@ const handleDropdownChange =(e,field)=>{
   //   ...prevData,[field]:selectedValue
   // })) 
 }
+const fetchData=async()=>{
+  const getstatus =      await   makeApiCall(Api_Endpoints.getStatus, 'GET');
+  
+  if(getstatus?.status===200){
+    const dropdownData = [
+     
+      {
+        label: "status",
+        placeholder: 'Select Status',
+        options: getstatus.data?.map((data) => ({
+          value: data.status_id, // Assuming your API response contains a 'value' field
+          label: data.name // Assuming your API response contains a 'label' field
+        }))
+      },
+      // Add more dropdown objects as needed
+    ];
+  setdropDownData(dropdownData)
+  
+  
+  
+  }else
+  {
+    showErrorToast(getstatus?.message)
+  }
+  
+    }
 
-useEffect(()=>{console.log(policyList)},[filterValue,policyList])
+    useEffect(()=>{fetchData()},[])
+useEffect(()=>{},[filterValue,policyList])
 
     return (
       <div style={{height:'100%'}}>
@@ -260,6 +235,7 @@ useEffect(()=>{console.log(policyList)},[filterValue,policyList])
           <LineChart />
         </div> */}
  <FilterContainer
+//  dropdownData={dropDownData}
         handleSearchChange={handleSearchChange}
         handleDropdownChange={handleDropdownChange}
         handleReset={handleReset}

@@ -111,7 +111,6 @@ const fetchdata=async()=>{
   return (
     <div className={`sidebar ${isOpen ? 'open' : ''}`}>
       <ul className="sidebar-menu">
-        {console.log(menuItems)}
         {menuItems?.map((item, index) => (
           
           <li key={index} className="menu-item" onClick={() => navigate(item.childUrl)}>
@@ -122,7 +121,7 @@ const fetchdata=async()=>{
       </ul>
    
   <div onClick={handleLogout} style={{display:'flex',flexDirection:'row',alignItems:'center',cursor:'pointer',position:'absolute',bottom:0,left:'50px'}}>
-  <p style={{color:'red'}}>Logout</p>
+  <p style={{color:'#dc4226'}}>Logout</p>
   <img src={Logout}  alt='Menu' style={{height:'40px',width:'40px'}}/>
   </div>
     </div>

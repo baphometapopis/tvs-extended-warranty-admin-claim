@@ -1,17 +1,31 @@
 import React, { useState } from 'react';
 import { useEffect } from 'react';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { Api_Endpoints } from '../../Api/apiEndpoint';
 import { makeApiCall } from '../../Api/makeApiCall';
 import Dropdown from '../../components/UI/Dropdown';
 import TextInput from '../../components/UI/TextInput';
-import { CloseIcon, EditIcon } from '../../Constant/ImageConstant';
+import { CloseIcon, Downloadpdf, EditIcon, ViewIcon } from '../../Constant/ImageConstant';
+import { showErrorToast, showSuccessToast } from '../../utils/toastService';
 import './ClaimViewPage.css';
 
 export const ClaimViewPage = () => {
 const data = useLocation()
 const ClaimNumber=data?.state?.data?.claimNumber
-console.log(ClaimNumber)
+const navigate= useNavigate()
+const [attachments,setAttachments]=useState(null)
+// const attachments = { 
+//   "Services": {
+//     "serviceHistory1": "service_history_1",
+//     "serviceHistory2": "service_history_2",
+//     "serviceHistory3": null
+//   },
+//   // "ECM": {
+//   //   "ErrorCode01": "Errorcode1",
+//   //   "ErrorCode02": null
+//   // }
+// };
+
 
 const [formData, setFormData] = useState({
   claim_id: '',
@@ -77,10 +91,10 @@ const [formData, setFormData] = useState({
 
 
 // const ogEstimation =[
-//   { id: 1, part_description: 'part1', hsn_code: 'HSN001', repair_mrp: '250', qty: '2', repair_tax_rate: '3%', total_mrp: '1212',model:'Apache' },
-//   { id: 2, part_description: 'part2', hsn_code: 'HSN002', repair_mrp: '250', qty: '2', repair_tax_rate: '3%', total_mrp: '12',model:'Apache' },
-//   { id: 3, part_description: 'part3', hsn_code: 'HSN003', repair_mrp: '250', qty: '2', repair_tax_rate: '3%', total_mrp: '21212',model:'Apache' },
-//   { id: 4, part_description: 'part4', hsn_code: 'HSN004', repair_mrp: '250', qty: '2', repair_tax_rate: '3%', total_mrp: '342',model:'Apache' },
+//   { id: 1, part_description: 'part1', hsn_code: 'HSN001', mrp: '250', qty: '2', tax_rate: '3%', mrp: '1212',model:'Apache' },
+//   { id: 2, part_description: 'part2', hsn_code: 'HSN002', mrp: '250', qty: '2', tax_rate: '3%', mrp: '12',model:'Apache' },
+//   { id: 3, part_description: 'part3', hsn_code: 'HSN003', mrp: '250', qty: '2', tax_rate: '3%', mrp: '21212',model:'Apache' },
+//   { id: 4, part_description: 'part4', hsn_code: 'HSN004', mrp: '250', qty: '2', tax_rate: '3%', mrp: '342',model:'Apache' },
 // ]
 
   const [estimations, setEstimations] = useState([]);
@@ -105,7 +119,7 @@ const [formData, setFormData] = useState({
   const handleChange = (e, field, index = null) => {
 
     if (index !== null) {
-      const updatedEstimations = estimations.map((item, idx) =>
+      const updatedEstimations = estimations?.map((item, idx) =>
         idx === index ? { ...item, [field]: e.target.value } : item
       );
       setEstimations(updatedEstimations);
@@ -115,7 +129,6 @@ const [formData, setFormData] = useState({
   };
   const handleEditClick = (index) => {
 
-    console.log(estimations[index])
     setIsEditing(index);
   };
 
@@ -162,7 +175,6 @@ const [formData, setFormData] = useState({
         }
       });
   
-      console.log(updatedEstimation)
       // Update the estimations array
       const newEstimations = [...estimations];
       newEstimations[index] = updatedEstimation;
@@ -187,11 +199,70 @@ const [formData, setFormData] = useState({
   ];
 
   const handleChangeStatus = (event) => {
-    console.log(event.target.value)
     setStatus(event.target.value);
     setError('');
   };
+
+
+  const updateClaimStatus = async () => {
+  
+    let allEstimationsUpdated = true;
+  
+    // Update estimations if there are any edited estimations
+    if (editedEstimations.length > 0) {
+      for (const estimation of editedEstimations) {
+        const updateEstimation = {
+          claim_id: formData?.claim_id,
+          part_estimatiom: {
+            id: estimation.id,
+            claim_id: estimation?.claim_id,
+            customer_id: estimation.customer_id,
+            part_code: estimation.part_code,
+            hsn_code: estimation.hsn_code,
+            tax_rate: estimation.tax_rate,
+            part_description: estimation.part_description,
+            mrp: estimation.mrp,
+            repair_mrp: estimation.repair_mrp,
+            labour_gst: estimation.labour_gst,
+            labour_charge: estimation.labour_charge,
+            repair_tax_rate: estimation.repair_tax_rate,
+            total_mrp: estimation.total_mrp
+          }
+        };
+  
+        const editEstimationres = await makeApiCall(Api_Endpoints.updateEstimation, 'POST', updateEstimation);
+        if (editEstimationres?.status === 200) {
+          showSuccessToast(editEstimationres?.message);
+        } else {
+          showErrorToast(editEstimationres?.message);
+          allEstimationsUpdated = false; // Mark as false if any estimation update fails
+        }
+      }
+    }
+  
+    // Update claim status only if all estimations were updated successfully
+    if (allEstimationsUpdated) {
+      const data = {
+        claim_id: formData?.claim_id,
+        status: editedEstimations.length > 0 ? 4 : status
+      };
+  
+      const updatestatus = await makeApiCall(Api_Endpoints.updateStatus, 'POST', data);
+      if (updatestatus?.status === 200) {
+        showSuccessToast('Status Updated');
+        navigate('/claims');
+      } else {
+        showErrorToast(updatestatus?.message);
+      }
+    } else {
+      showErrorToast('Failed to update all estimations. Status update aborted.');
+    }
+  };
+  
+  
+
   const getClaimData = async () => {
+
     const getstatus =      await   makeApiCall(Api_Endpoints.getStatus, 'GET');
 if(getstatus?.status===200){
     setAdminStatus(getstatus?.data)}
@@ -199,7 +270,7 @@ if(getstatus?.status===200){
     const response = await makeApiCall(Api_Endpoints.getClaimDetails, 'GET', { claim_id: ClaimNumber });
     const claimData = response?.data;
 
-    // Assuming claimData has a similar structure, you can update formData like this:
+   if(response?.status===200){ // Assuming claimData has a similar structure, you can update formData like this:
     setFormData({
       claim_id: claimData.claim_id,
       policy_id: claimData.policy_id,
@@ -243,23 +314,30 @@ if(getstatus?.status===200){
       updatedAt: claimData.updatedAt,
       StatusId: claimData.StatusId
     });
+    setAttachments({Services:claimData?.attachments??''})
+    
 
     setOgEstimation(claimData?.PartEstimation)
     setEstimations(claimData?.PartEstimation)
+}else{
+  showErrorToast(response?.message)
 
-    console.log(response?.data);
+}
   };
 
 
-useEffect(()=>{getClaimData()},[])
+useEffect(()=>{getClaimData();
+},[])
 
   useEffect(()=>{},[estimations])
   return (
     <div className='ClaimViewContainer'>
       <div className='Tabs'>
-        <button className={selectedTab === 'claim_details' ? 'active' : ''} onClick={() => setSelectedTab('claim_details')}> Claim Details</button>
-        <button className={selectedTab === 'claim_estimation' ? 'active' : ''} onClick={() => setSelectedTab('claim_estimation')}>Claim Estimation</button>
-        <button className={selectedTab === 'status' ? 'active' : ''} onClick={() => setSelectedTab('status')}>Status</button>
+        <button className={selectedTab === 'claim_details' ? 'active' : 'no-active'} onClick={() => setSelectedTab('claim_details')}> Claim Details</button>
+        <button className={selectedTab === 'claim_estimation' ? 'active' : 'no-active'} onClick={() => setSelectedTab('claim_estimation')}>Claim Estimation</button>
+        <button className={selectedTab === 'claim_attachments' ? 'active' : 'no-active'} onClick={() => setSelectedTab('claim_attachments')}>Claim Attachments</button>
+
+        <button className={selectedTab === 'status' ? 'active' : 'no-active'} onClick={() => setSelectedTab('status')}>Status</button>
       </div>
 
       {selectedTab === 'claim_details' && (
@@ -279,7 +357,7 @@ useEffect(()=>{getClaimData()},[])
             label="Claim No"
             name="claim_id"
             required={true}
-            value={formData.claim_id}
+            value={formData?.claim_id}
             onChange={(e) => handleChange(e, 'claim_id')}
             placeholder="Enter Claim Id"
             error={formErrors.claim_id}
@@ -570,12 +648,17 @@ useEffect(()=>{getClaimData()},[])
             <div className='HeaderItem'>HSN CODE</div>
             <div className='HeaderItem'>Model</div>
 
-            <div className='HeaderItem'>Repair Price</div>
+            <div className='HeaderItem'>Unit Price</div>
             <div className='HeaderItem'>GST</div>
+            <div className='HeaderItem'>labour Charge</div>
+            <div className='HeaderItem'>labour GST</div>
+
             <div className='HeaderItem'>Total</div>
 {isEditing!==null && <div className='HeaderItem'>Action</div>}
           </div>
-          {estimations.map((estimation, index) => (
+          <div>
+          {estimations?.length>0?  <>
+          {estimations?.map((estimation, index) => (
             <div className='EstimationRow' key={index}>
 
               {isEditing === index ? (
@@ -598,20 +681,36 @@ useEffect(()=>{getClaimData()},[])
                     isDisabled={false}
                   />
                   <TextInput
-                    name="repair_mrp"
-                    value={estimation.repair_mrp}
-                    onChange={(e) => handleChange(e, 'repair_mrp', index)}
-                    placeholder="Enter Repair Price"
-                    error={formErrors.repair_mrp}
+                    name="mrp"
+                    value={estimation.mrp}
+                    onChange={(e) => handleChange(e, 'mrp', index)}
+                    placeholder="Enter Unit Price"
+                    error={formErrors.mrp}
                     isDisabled={false}
                   />
                 
                   <TextInput
-                    name="repair_tax_rate"
-                    value={estimation.repair_tax_rate}
-                    onChange={(e) => handleChange(e, 'repair_tax_rate', index)}
+                    name="tax_rate"
+                    value={estimation.tax_rate}
+                    onChange={(e) => handleChange(e, 'tax_rate', index)}
                     placeholder="Enter GST"
-                    error={formErrors.repair_tax_rate}
+                    error={formErrors.tax_rate}
+                    isDisabled={false}
+                  />
+                   <TextInput
+                    name="labour_charge"
+                    value={estimation.labour_charge}
+                    onChange={(e) => handleChange(e, 'labour_charge', index)}
+                    placeholder="Enter Labour Charge"
+                    error={formErrors.labour_charge}
+                    isDisabled={false}
+                  />
+                   <TextInput
+                    name="labour_gst"
+                    value={estimation.labour_gst}
+                    onChange={(e) => handleChange(e, 'labour_gst', index)}
+                    placeholder="Enter Labour GST"
+                    error={formErrors.labour_gst}
                     isDisabled={false}
                   />
                   <TextInput
@@ -622,6 +721,7 @@ useEffect(()=>{getClaimData()},[])
                     error={formErrors.total_mrp}
                     isDisabled={false}
                   />
+
                   <button style={{backgroundColor:'green'}} onClick={() => handleUpdateClick(index,)}>Update</button>
                 </>
               ) : (
@@ -645,20 +745,36 @@ useEffect(()=>{getClaimData()},[])
                     isDisabled={true}
                   />
                   <TextInput
-                    name="repair_mrp"
-                    value={estimation.repair_mrp}
-                    onChange={(e) => handleChange(e, 'repair_mrp', index)}
-                    placeholder="Enter Repair Price"
-                    error={formErrors.repair_mrp}
+                    name="mrp"
+                    value={estimation.mrp}
+                    onChange={(e) => handleChange(e, 'mrp', index)}
+                    placeholder="Enter Unit Price"
+                    error={formErrors.mrp}
                     isDisabled={true}
                   />
                 
                   <TextInput
-                    name="repair_tax_rate"
-                    value={estimation.repair_tax_rate}
-                    onChange={(e) => handleChange(e, 'repair_tax_rate', index)}
+                    name="tax_rate"
+                    value={estimation.tax_rate}
+                    onChange={(e) => handleChange(e, 'tax_rate', index)}
                     placeholder="Enter GST"
-                    error={formErrors.repair_tax_rate}
+                    error={formErrors.tax_rate}
+                    isDisabled={true}
+                  />
+                   <TextInput
+                    name="labour_charge"
+                    value={estimation.labour_charge}
+                    onChange={(e) => handleChange(e, 'labour_charge', index)}
+                    placeholder="Enter Labour Charge"
+                    error={formErrors.labour_charge}
+                    isDisabled={true}
+                  />
+                    <TextInput
+                    name="labour_gst"
+                    value={estimation.labour_gst}
+                    onChange={(e) => handleChange(e, 'labour_gst', index)}
+                    placeholder="Enter Labour GST"
+                    error={formErrors.labour_gst}
                     isDisabled={true}
                   />
                   <TextInput
@@ -675,14 +791,41 @@ useEffect(()=>{getClaimData()},[])
               )}
             </div>
           ))}
+          </>:<p style={{fontWeight:'bold',fontSize:'22px',textAlign:'center'}}>No Parts Estimation found</p>}
+          </div>
         </div>
       )}
 
+{selectedTab === 'claim_attachments' && ( <div className="attachment-container">
+  {console.log(attachments)}
+      {Object.entries(attachments)?.map(([category, files], index) => (
+        <div key={index} className="category-section">
+          <h2>{category}</h2>
+          <ul className="attachment-list">
+            {Object.entries(files)?.map(([fileKey, fileValue], index) => (
+              <li key={index} className="attachment-item">
+<span>{fileKey === 'firstServiceFile' ? 'First Service' : fileKey === 'secondServiceFile' ? 'Second Service' : fileKey === 'thirdServiceFile' ? 'Third Service':fileKey}</span>
+                {fileValue ? (
+                  <div>
+                    <img  style={{width:'30px',cursor:'pointer',marginRight:'15px'}} src={ViewIcon} />
+   <img  src={Downloadpdf}  style={{width:'30px',cursor:'pointer'}}  />
+
+                   
+                  </div>
+                ) : (
+                  <span className="not-available">Not Available</span>
+                )}
+              </li>
+            ))}
+          </ul>
+        </div>
+      ))}
+    </div>)}
       {selectedTab === 'status' && (
         <div className='UpdateStatus'>
            <Dropdown
         
-        value={editedEstimations.length > 0 ? 3 :status } // Select ReferBack by default if no data in updated estimations
+        value={editedEstimations.length > 0 ? 4 :status } // Select ReferBack by default if no data in updated estimations
 
         onChange={handleChangeStatus}
         options={ adminStatus?.map((data) => ({
@@ -696,15 +839,14 @@ useEffect(()=>{getClaimData()},[])
       
       />
         <textarea value={adminComment}  onChange={handleChangeText} style={{width:'100%',height:'150px',marginTop:'25px'}} placeholder="Enter Remarks"></textarea>
-<div style={{width:'fit-content',padding:'3px 0px',borderRadius:'25px',border:'2px solid #253C80',marginTop:'10px',cursor:'pointer'}}>
-        <p style={{color:'#253C80',margin:'5px 20px'}}>Submit</p>
+<div  style={{width:'fit-content',padding:'3px 0px',borderRadius:'25px',border:'2px solid #253C80',marginTop:'10px',cursor:'pointer'}}>
+        <p  onClick={updateClaimStatus} style={{color:'#253C80',margin:'5px 20px'}}>Submit</p>
         </div>
 <h2>Updated Estimation</h2>
 
-{editedEstimations.map((editedEstimations, index) => (
+{editedEstimations?.map((editedEstimations, index) => (
   
             <div className='EstimationRow' key={index}   >
-{console.log(editedEstimations,'EditedEstimations')}
 
 
               
@@ -712,19 +854,19 @@ useEffect(()=>{getClaimData()},[])
 
                   <TextInput
                     name="category"
-                    value={editedEstimations.category}
+                    value={editedEstimations.part_description}
                     onChange={(e) => handleChange(e, 'category', index)}
                     placeholder="Enter Category"
-                    error={formErrors.category}
+                    error={formErrors.part_description}
                     isDisabled={true}
                   />
                   <div className='PlainText'>{editedEstimations.hsn_code}</div>
                   <TextInput
-                    name="repair_mrp"
-                    value={editedEstimations.repair_mrp}
-                    onChange={(e) => handleChange(e, 'repair_mrp', index)}
-                    placeholder="Enter Repair Price"
-                    error={formErrors.repair_mrp}
+                    name="mrp"
+                    value={editedEstimations.mrp}
+                    onChange={(e) => handleChange(e, 'mrp', index)}
+                    placeholder="Enter Unit Price"
+                    error={formErrors.mrp}
                     isDisabled={true}
                   />
                   <TextInput
@@ -736,11 +878,27 @@ useEffect(()=>{getClaimData()},[])
                     isDisabled={true}
                   />
                   <TextInput
-                    name="repair_tax_rate"
-                    value={editedEstimations.repair_tax_rate}
-                    onChange={(e) => handleChange(e, 'repair_tax_rate', index)}
+                    name="tax_rate"
+                    value={editedEstimations.tax_rate}
+                    onChange={(e) => handleChange(e, 'tax_rate', index)}
                     placeholder="Enter GST"
-                    error={formErrors.repair_tax_rate}
+                    error={formErrors.tax_rate}
+                    isDisabled={true}
+                  />
+                    <TextInput
+                    name="labour_charge"
+                    value={editedEstimations.labour_charge}
+                    onChange={(e) => handleChange(e, 'labour_charge', index)}
+                    placeholder="Enter Labour Charge"
+                    error={formErrors.labour_charge}
+                    isDisabled={true}
+                  />
+                   <TextInput
+                    name="labour_gst"
+                    value={editedEstimations.labour_gst}
+                    onChange={(e) => handleChange(e, 'labour_gst', index)}
+                    placeholder="Enter Labour GST"
+                    error={formErrors.labour_gst}
                     isDisabled={true}
                   />
                   <TextInput

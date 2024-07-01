@@ -22,7 +22,6 @@ const ClaimListTable = ({ data, refresh }) => {
 
 
   const handleViewReports=(params)=>{
-    console.log(params?.row)
     navigate('/view-claim',{state:{
       data:params?.row
     }})
@@ -52,7 +51,7 @@ const getVariable = (status) => {
             return 'Rejected';
 
             case 3:
-        return 'Accepted';
+        return 'Approved';
                
       default:
         return ''
@@ -64,36 +63,41 @@ const getVariable = (status) => {
 
 
         return {
-          backgroundColor: "#FCD34D",
-          color: "#ffffff",
-          padding:'5px',
-          borderRadius:'8px'
-
+          backgroundColor: "#fff4cf",
+          color: "#edb600",
+          padding:'5px 8px',
+          borderRadius:'25px',
+          fontWeight:'bold'
+         
         
         };
-      case 'Accepted':
+      case 'Approved':
         return {
-          backgroundColor: "#ff6347",
-          color: "#ffffff",
-          padding:'5px',
-
-          borderRadius:'8px'
+        
+          backgroundColor: "#a9ffe2",
+          color: "#00a36c",
+          padding:'5px 8px',
+          borderRadius:'25px',
+  fontWeight:'bold'
         
         };
       case 'Rejected':
         return {
-          backgroundColor: "#dc143c",
-          color: "#ffffff",
-          padding:'5px',
-          borderRadius:'8px'
+          backgroundColor: "#ffd1d1",
+          color: "#ff0505",
+          padding:'5px 8px',
+          borderRadius:'25px',
+      fontWeight:'bold'
         
         };
         case 'ReferBack':
             return {
-              backgroundColor: "#3cb371",
-              color: "#ffffff",
-              padding:'5px',
-              borderRadius:'8px'
+              backgroundColor: "#ffdfa4",
+              color: "#FFA500",
+              padding:'5px 8px',
+              borderRadius:'25px',
+          fontWeight:'bold'
+
             
             };
             case 4:
@@ -275,7 +279,7 @@ const getVariable = (status) => {
         refresh={refresh}
       /> */}
       <DataGrid
-              rows={data.map((row, index) => ({ ...row, id: index })) || []}
+              rows={data?.map((row, index) => ({ ...row, id: index })) || []}
 
         pagination={false}
         // rows={data || []}

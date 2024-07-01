@@ -17,7 +17,6 @@ const [state,setstate]=useState('')
 
 
 const handleFilterChange = async (data) => {
-  console.log(data, 'handleFilterChange');
 
   try {
     let endpoint = '';
@@ -47,7 +46,6 @@ startDate:data?.startDate??'',
 endDate:data?.endDate??'',
 searchTerm:data?.search??''
     }
-    console.log(endpoint)
     if (endpoint) {
       const response = await makeApiCall(endpoint, 'GET',postData);
 if(response?.status===200){
@@ -65,7 +63,6 @@ else{
   showErrorToast(response?.message)
 }
 
-      console.log(response); // Handle response data as needed
     } else {
       console.log('Invalid report selected');
     }
@@ -129,6 +126,21 @@ const generateExcelFile = (exceldata) => {
 };
 
 
+// const generateExcelFile = (event) => {
+//   let fileObj = event.target.files[0];
+//   //just pass the fileObj as parameter
+//   ExcelRenderer(fileObj, (err, resp) => {
+//     if(err){
+//       console.log(err);            
+//     }
+//     else{
+//       setstate({
+//         cols: resp.cols,
+//         rows: resp.rows
+//       });
+//     }
+//   });               
+// }
 
 
 
@@ -158,11 +170,9 @@ const getColumnWidth = (ws, columnHeader) => {
   };
   
   const handleReset = () => {
-    // setFilterValue({
-    //   searchParam: '',
-    //   productType: '',
-    //   Status: ''
-    // });
+    setstate(null)
+
+    
   };
   const handleDropdownChange =(e,field)=>{
     const selectedValue=e.target.value;
@@ -229,6 +239,8 @@ setdropDownData(dropdownData)
   
   return (
     <div className='ReportContainer'>
+      {/* <input type="file" onChange={generateExcelFile} style={{"padding":"10px"}} /> */}
+
  <FilterContainer
        handleFilterChange={handleFilterChange}
         handleReset={handleReset}

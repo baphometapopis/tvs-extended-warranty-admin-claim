@@ -13,7 +13,7 @@ const createSvgFromPartsData = async (partsData) => {
     // Render the parts data to the hidden container
     ReactDOM.render(
         <div className="card-container">
-            {partsData.map(part => (
+            {partsData?.map(part => (
                 <div key={part.part_id} className="card">
                     <h3>{part.part_description}</h3>
                     <p>Part Code: {part.part_code}</p>

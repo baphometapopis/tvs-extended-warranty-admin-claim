@@ -5,60 +5,16 @@ import moment from "moment";
 import { styled } from "@mui/material/styles";
 import { useNavigate } from "react-router-dom";
 import InvoiceModalComponent from "./InvoiceModal/InvoiceModal";
+import { ViewIcon } from "../../Constant/ImageConstant";
+import { makeApiCall } from "../../Api/makeApiCall";
+import { Api_Endpoints } from "../../Api/apiEndpoint";
+import { showErrorToast, showSuccessToast } from "../../utils/toastService";
 
-const InvoiceGenerationListPageTable = ({ refresh }) => {
+const InvoiceGenerationListPageTable = ({ refresh,data }) => {
   const [isUtrModalOpen, setIsUtrModalOpen] = useState(false);
   const [selectedRow, setSelectedRow] = useState(null);
 
-  const data = [
-    {
-      id: 1,
-      proposal_no: "PRO123456",
-      claim_no: "CLMV123456",
-      invoice_no: "INV123456",
-
-      insured_name: "Dealer One",
-      utr_no: "UTR123456",
-      invoice_status: 1,
-      created_at: "2023-06-01T12:34:56",
-    },
-    {
-      id: 2,
-      proposal_no: "PRO123456",
-      claim_no: "CLMV123456",
-      invoice_no: "INV123456",      insured_name: "Dealer Two",
-      utr_no: "UTR654321",
-      invoice_status: 0,
-      created_at: "2023-05-25T08:15:30",
-    },
-    {
-      id: 3,
-      proposal_no: "PRO123456",
-      claim_no: "CLMV123456",
-      invoice_no: "INV123456",      insured_name: "Dealer Three",
-      utr_no: "UTR112233",
-      invoice_status: 2,
-      created_at: "2023-04-14T10:20:45",
-    },
-    {
-      id: 4,
-      proposal_no: "PRO123456",
-      claim_no: "CLMV123456",
-      invoice_no: "INV123456",      insured_name: "Dealer Four",
-      utr_no: "UTR445566",
-      invoice_status: 1,
-      created_at: "2023-03-12T14:30:00",
-    },
-    {
-      id: 5,
-      proposal_no: "PRO123456",
-      claim_no: "CLMV123456",
-      invoice_no: "INV123456",      insured_name: "Dealer Five",
-      utr_no: "",
-      invoice_status: 3,
-      created_at: "2023-02-28T09:45:12",
-    },
-  ];
+ 
 
   const navigate = useNavigate();
   const [isCancelModalOpen, setIsCancelModalOpen] = useState(false);
@@ -69,21 +25,33 @@ const InvoiceGenerationListPageTable = ({ refresh }) => {
     setSelectedCancelPolicyData(prop);
   };
 
-  const handleUtrAction = (params) => {
-    if (!params.row.utr_no) {
-      setSelectedRow(params.row);
-      setIsUtrModalOpen(true);
-    } else {
-      navigate("/simpleView", { state: { insuredName: params.row.insured_name, invoiceNumber: params.row.proposal_no } });
+  const handleUtrAction = async(params) => {
+
+   const getInvoicedetails=await makeApiCall(Api_Endpoints.getInvoices,'GET',{invoice_number:params.row?.invoice_number})
+    if(getInvoicedetails?.status!==200){
+      showErrorToast(getInvoicedetails?.message)
     }
+    else{
+      setSelectedRow(getInvoicedetails?.data);
+      setIsUtrModalOpen(true);
+
+
+    }
+
+    // if (!params.row.utr_no) { 
+    //   setSelectedRow(params.row);
+    // } else {
+    //   navigate("/simpleView", { state: { insuredName: params.row.insured_name, invoiceNumber: params.row.proposal_no } });
+    // }
   };
 
-  const handleUtrSubmit = (utrNo) => {
+  const handleUtrSubmit = () => {
     // Update the UTR No for the selected row and perform any necessary actions
-    console.log("New UTR No:", utrNo);
     // Here you can call an API to update the UTR No, or update the state accordingly
-
+    refresh()
     setIsUtrModalOpen(false);
+
+
   };
 
 
@@ -152,31 +120,32 @@ const InvoiceGenerationListPageTable = ({ refresh }) => {
   // },
   const columns = [
     {
-      field: "invoice_no",
+      field: "invoice_number",
       headerName: "Invoice No",
       width: 200,
       headerClassName: "super-app-theme--header",
     },
+   
     {
-      field: "proposal_no",
-      headerName: "Proposal No",
-      width: 200,
-      headerClassName: "super-app-theme--header",
-    },
-    {
-      field: "claim_no",
+      field: "claim_id",
       headerName: "Claim No",
       width: 200,
       headerClassName: "super-app-theme--header",
     },
     {
-      field: "insured_name",
+      field: "FullName",
       headerName: "Dealer Name",
       width: 350,
       headerClassName: "super-app-theme--header",
     },
     {
-      field: "utr_no",
+      field: "invoice_amount",
+      headerName: "Invoice Amount",
+      width: 150,
+      headerClassName: "super-app-theme--header",
+    },
+    {
+      field: "utr_number",
       headerName: "Utr No",
       width: 200,
       headerClassName: "super-app-theme--header",
@@ -188,7 +157,7 @@ const InvoiceGenerationListPageTable = ({ refresh }) => {
       width: 180,
       headerClassName: "super-app-theme--header",
       valueFormatter: (params) => {
-        const formattedDate = moment(params.value).format("DD-MM-YYYY");
+        const formattedDate = moment(params?.value).format("DD-MM-YYYY");
         return formattedDate;
       },
     },
@@ -196,24 +165,29 @@ const InvoiceGenerationListPageTable = ({ refresh }) => {
       field: "actions",
       headerName: "Action",
       headerClassName: "super-app-theme--header",
-      width: 290,
+      width: 250,
       renderCell: (params) => (
-        <div style={{ display: 'flex', gap: '5px' }}>
-        {params.row.utr_no===''&&  <div
-            onClick={() => handleUtrAction(params)}
-            style={{
-              backgroundColor: "#007bff",
-              width: 'fit-content',
-              padding: '5px',
-              borderRadius: '6px',
-              color: 'white',
-              cursor: 'pointer'
-            }}
-          >
-            Update Utr No
-          </div>}
+        <div  style={{display:'flex',gap:'5px',justifyContent:'center'}}>
+
+         <img  onClick={()=> handleUtrAction(params)}  style={{width:'30px',cursor:'pointer'}} src={ViewIcon} />
+        {/* <img  src={Downloadpdf} onClick={()=>console.log('Download PDF')} style={{width:'30px',cursor:'pointer'}}  /> */}
+     </div>
+        // <div style={{ display: 'flex', gap: '5px' }}>
+        // {params.row.utr_no===''&&  <div
+        //     onClick={() => handleUtrAction(params)}
+        //     style={{
+        //       backgroundColor: "#007bff",
+        //       width: 'fit-content',
+        //       padding: '5px',
+        //       borderRadius: '6px',
+        //       color: 'white',
+        //       cursor: 'pointer'
+        //     }}
+        //   >
+        //     Update Utr No
+        //   </div>}
      
-        </div>
+        // </div>
       ),
     },
   ];
@@ -302,15 +276,18 @@ const InvoiceGenerationListPageTable = ({ refresh }) => {
     }}
   >
      <InvoiceModalComponent 
-        isOpen={isUtrModalOpen} 
+        // isOpen={isUtrModalOpen} 
+        isOpen={true} 
+
         onClose={() => setIsUtrModalOpen(false)}
+
         onSubmit={handleUtrSubmit}
         data={selectedRow}
       />
 
 
     <DataGrid
-            rows={data.map((row, index) => ({ ...row, id: index })) || []}
+            rows={data?.map((row, index) => ({ ...row, id: index })) || []}
 
       pagination={false}
       // rows={data || []}

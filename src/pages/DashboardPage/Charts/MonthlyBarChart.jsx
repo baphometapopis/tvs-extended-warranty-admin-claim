@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
 import ReactApexChart from 'react-apexcharts';
 
-const MonthlyBarChart = ({ monthlyData,applyYear }) => {
+const MonthlyBarChart = ({ monthlyData,applyYear,appliedYear }) => {
   const currentYear = new Date().getFullYear();
-  const [year, setYear] = useState(currentYear);
-  const [inputYear, setInputYear] = useState(currentYear);
+  const [year, setYear] = useState(appliedYear);
+  const [inputYear, setInputYear] = useState(appliedYear);
 
   const handleYearChange = (event) => {
     const value = event.target.value;
@@ -15,7 +15,8 @@ const MonthlyBarChart = ({ monthlyData,applyYear }) => {
 
   const handleOkClick = () => {
     const parsedYear = parseInt(inputYear, 10);
-    if (parsedYear<=currentYear) {
+    console.log(parsedYear)
+    if (parsedYear<=currentYear&& parsedYear>=2023) {
       setYear(parsedYear);
       applyYear(parsedYear)
     } else {
@@ -57,31 +58,31 @@ const MonthlyBarChart = ({ monthlyData,applyYear }) => {
   const series = [
     {
       name: 'Pending',
-      data: data.map(item => item.pending),
+      data: data?.map(item => item.pending),
     },
     {
       name: 'Approved',
-      data: data.map(item => item.approved),
+      data: data?.map(item => item.approved),
     },
     {
       name: 'Rejected',
-      data: data.map(item => item.rejected),
+      data: data?.map(item => item.rejected),
     },
     {
       name: 'Referred-Back',
-      data: data.map(item => item.referredBack),
+      data: data?.map(item => item.referredBack),
     },
   ];
 
   return (
     <div style={{ width: '100%', height: '100%' }}>
       <div style={{display: 'flex', justifyContent: 'space-between'}}>
-        <h2 style={{ color: '#253C80' }}>{year} Monthly Data</h2>
+        <h2 style={{ color: '#253C80' }}>{appliedYear} Monthly Data</h2>
         <div style={{ marginBottom: '20px', display: 'flex' }}>
           <input
             type="number"
             value={inputYear}
-            placeholder={currentYear}
+            placeholder={appliedYear}
             onChange={handleYearChange}
             min={2023}
             max={currentYear}

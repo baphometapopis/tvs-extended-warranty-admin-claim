@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import Select from 'react-select';
 import { Api_Endpoints } from '../../../Api/apiEndpoint';
 import { makeApiCall } from '../../../Api/makeApiCall';
+import { showErrorToast } from '../../../utils/toastService';
 import './FilterModal.css';
 
 const ModalComponent = ({ isOpen, onClose, applyFilters }) => {
@@ -25,6 +26,8 @@ const ModalComponent = ({ isOpen, onClose, applyFilters }) => {
         value: dealer.UserMasterId,
         label: dealer.FullName,
       })));
+    }else{
+      showErrorToast(response3?.message)
     }
 
     if (response2?.status === 200) {
@@ -32,21 +35,27 @@ const ModalComponent = ({ isOpen, onClose, applyFilters }) => {
         value: state.state_id,
         label: state.state_name,
       })));
+    }else{
+      showErrorToast(response2?.message)
     }
 
+
     if (response1?.status === 200) {
-      setModelOptions(response1.data.map(model => ({
+      setModelOptions(response1.data?.map(model => ({
         value: model.model_id,
         label: model.model_name,
       })));
+    }else{
+      showErrorToast(response1?.message)
     }
+
   };
 
   const getCities = async (stateId) => {
     const response = await makeApiCall(Api_Endpoints.getCity, 'GET', { state_id: stateId });
 
     if (response?.status === 200) {
-      setCityOptions(response.data.map(city => ({
+      setCityOptions(response.data?.map(city => ({
         value: city.city_id,
         label: city.city_name,
       })));
@@ -58,6 +67,7 @@ const ModalComponent = ({ isOpen, onClose, applyFilters }) => {
   }, []);
 
   const handleApplyFilters = () => {
+
     const filterData = {
       dealer_id: selectedDealer ?? '',
       model_id: selectedModel ?? '',
@@ -85,12 +95,9 @@ const ModalComponent = ({ isOpen, onClose, applyFilters }) => {
     setCityOptions([]);
 
     // Call the applyFilters function with empty filter data
-    applyFilters({
-      dealer_id: '',
-      model_id: '',
-      city: '',
-      state: ''
-    });
+    applyFilters(null);
+    
+
   };
 
   const customStyles = {
@@ -109,6 +116,7 @@ const ModalComponent = ({ isOpen, onClose, applyFilters }) => {
     }),
   };
 
+  useEffect(()=>{},[selectedDealer,selectedCity,selectedModel,selectedState,appliedFilters,cityOptions])
   return (
     <div className={`modal-overlay ${isOpen ? 'open' : ''}`}>
       <div className={`modal-content ${isOpen ? 'slide-in' : 'slide-out'}`}>
@@ -116,7 +124,7 @@ const ModalComponent = ({ isOpen, onClose, applyFilters }) => {
           &times;
         </p>
         <h2>Filter Options</h2>
-        <div className="applied-filters">
+        {/* <div className="applied-filters">
           {appliedFilters.length > 0 && (
             <div className="applied-filters-container">
               <p className="applied-filters-title">Applied Filters:</p>
@@ -127,7 +135,7 @@ const ModalComponent = ({ isOpen, onClose, applyFilters }) => {
               </ul>
             </div>
           )}
-        </div>
+        </div> */}
         <div className="filter-dropdowns">
           <div className="dropdown-container">
             <label htmlFor="dealer_id">Dealer ID</label>
@@ -138,7 +146,7 @@ const ModalComponent = ({ isOpen, onClose, applyFilters }) => {
                 setSelectedDealer(selectedOption.value);
               }}
               styles={customStyles}
-              value={dealerOptions.find(option => option.value === selectedDealer)}
+              value={selectedDealer}
             />
           </div>
           <div className="dropdown-container">
@@ -150,7 +158,7 @@ const ModalComponent = ({ isOpen, onClose, applyFilters }) => {
                 setSelectedModel(selectedOption.value);
               }}
               styles={customStyles}
-              value={modelOptions.find(option => option.value === selectedModel)}
+              value={selectedModel}
             />
           </div>
           <div className="dropdown-container">
@@ -163,7 +171,7 @@ const ModalComponent = ({ isOpen, onClose, applyFilters }) => {
                 getCities(selectedOption?.value);
               }}
               styles={customStyles}
-              value={stateOptions.find(option => option.value === selectedState)}
+              value={selectedState}
             />
           </div>
           <div className="dropdown-container">
@@ -175,7 +183,7 @@ const ModalComponent = ({ isOpen, onClose, applyFilters }) => {
                 setSelectedCity(selectedOption.value);
               }}
               styles={customStyles}
-              value={cityOptions.find(option => option.value === selectedCity)}
+              value={selectedCity}
               isDisabled={!selectedState} // Disable if no state is selected
             />
           </div>

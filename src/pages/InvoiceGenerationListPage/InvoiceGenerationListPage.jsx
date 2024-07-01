@@ -1,18 +1,21 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import Tippy from "@tippyjs/react";
 import "tippy.js/dist/tippy.css";
-// import { getAllProposalListApi } from '../Api/FetchAllProposalList';
-// import { Search } from '../Constant/ImageConstant';
 
 import './InvoiceGenerationListPage.css'
-// import Dropdown from '../Component/UI/Dropdown';
 
 import { getUserSession } from '../../utils/auth';
 import { calculatePagination } from '../../utils/calculatePagination';
-import InvoiceGenerationListPageTable from './InvoiceGenerationListPageTable';
+import { makeApiCall } from '../../Api/makeApiCall';
+import { Api_Endpoints } from '../../Api/apiEndpoint';
+import { SearchIcon } from '../../Constant/ImageConstant';
+import Dropdown from '../../components/UI/Dropdown';
 import FilterContainer from '../../components/FilterComponent/FilterContainer';
+import { showErrorToast, showSuccessToast } from '../../utils/toastService';
+import InvoiceGenerationListPageTable from './InvoiceGenerationListPageTable';
 
 const  InvoiceGenerationListPage=()=> {
+  const [dropDownData,setdropDownData]=useState([])
 
   const [filterValue,setFilterValue]=useState({
      searchParam:'',productType:'',Status:''
@@ -42,6 +45,7 @@ const  InvoiceGenerationListPage=()=> {
     "label": "Completed"
 },
 ]
+
 const [windowWidth, setWindowWidth] = useState([window.innerWidth]);
 
     const [currentPage, setCurrentPage] = useState(1);
@@ -59,7 +63,7 @@ const [windowWidth, setWindowWidth] = useState([window.innerWidth]);
     const [isRefreshButtonDisabled, setIsRefreshButtonDisabled] = useState(false);
   
     const [totalRecords, setTotalRecords] = useState("");
-    const [poicyList, setPolicyList] = useState([]);
+    const [invoiceList, setInvoiceList] = useState([]);
   
     const [indexOfLastRecord, setIndexOfLastRecord] = useState(10);
     const [indexOfFirstRecord, setIndexOfFirstRecord] = useState(0);
@@ -80,13 +84,16 @@ const [windowWidth, setWindowWidth] = useState([window.innerWidth]);
     };
   
   
-    const refreshpage = () => {};
+    const refreshpage = () => {
+      GetInvoiceList();
+
+    };
   
     const handleRefresh = () => {
       // Disable the button
       setIsRefreshButtonDisabled(true);
   
-      // GetProposalList();
+      // GetInvoiceList();
   
       setTimeout(() => {
         // Enable the button after 10 seconds
@@ -98,51 +105,49 @@ const [windowWidth, setWindowWidth] = useState([window.innerWidth]);
 
     const resetFilter=()=>{
       setFilterValue('')
-      GetProposalList();
+      GetInvoiceList();
     }
-    const GetProposalList = useCallback(() => {
+    const GetInvoiceList = useCallback(() => {
       const decryptdata=''
       const data = getUserSession();
    
 
     
       const listdata = {
-        length: filterValue?.length,
-       user_id:data?.data?.user_details?.id,
-  
-        search: filterValue?.searchParam??'',
-        start: indexOfFirstRecord,
-        end: recordsPerPage,
-        product_Type_id: filterValue?.productType??'',
-        Status:filterValue?.Status??''
+        type:0,
+        status:1,
+        page:currentPage,
+        pageSize:10,
+        // startDate:23/04/2024,
+        // endDate:07/06/2024,
+        searchTerm:''
       };
   
       if (indexOfFirstRecord !== indexOfLastRecord) {
-        // getAllProposalListApi(listdata)
-        //   .then((data) => {
-        //     console.log(data?.data)
-        //     setPolicyList(data?.data);
-        //     setTotalRecords(data?.total_count)
-        //     const pagination = calculatePagination(
-        //       data?.total_count,
-        //       recordsPerPage,
-        //       0
-        //     );
-        //     settotalPage(pagination?.totalPages);
-        //   })
-        //   .catch((error) => {
-        //     console.error(error, "dsdsds");
-        //   });
+
+        makeApiCall(Api_Endpoints.getInvoiceList, 'GET',listdata)
+        .then((data) => {
+            setInvoiceList(data?.data?.data);
+            setTotalRecords(data?.data?.totalRecords)
+            const pagination = calculatePagination(
+              data?.data?.totalRecords,
+              recordsPerPage,
+              0
+            );
+            settotalPage(pagination?.totalPages);
+          })
+          .catch((error) => {
+            console.error(error, "dsdsds");
+          });
       }
     }, [filterValue, indexOfFirstRecord, indexOfLastRecord, totalRecords]);
   
 
   
-    
     // const getSearchValue = (prop) => {
     //   setfilterValue(prop);
     //   // console.log(prop);
-    //   GetProposalList();
+    //   GetInvoiceList();
     // };
   
     useEffect(() => {
@@ -166,7 +171,7 @@ const [windowWidth, setWindowWidth] = useState([window.innerWidth]);
     }, [currentPage, recordsPerPage, totalPage]);
   
     useEffect(() => {
-      GetProposalList();
+      GetInvoiceList();
     }, [indexOfLastRecord, indexOfFirstRecord]);
   
 
@@ -225,47 +230,122 @@ const product=[
   }
 ]
 
+const handleFilterChange = async (data) => {
+
+  try {
+
+    // Switch-case statement to select endpoint based on selected report
+   
+
+    let postData={
+
+      type:0,
+status:data?.status??'',
+startDate:data?.startDate??'',
+endDate:data?.endDate??'',
+searchTerm:data?.search??''
+    }
+    if (data) {
+      const response = await makeApiCall(Api_Endpoints.getClaimedPolicy, 'GET',postData);
+if(response?.status===200){
+  setInvoiceList(response?.data?.data)
+
+if(response?.data?.data.length!==0){
+
+  showSuccessToast('No Record Found')
+
+  }
+
+}
+else{
+
+  showErrorToast(response?.message)
+}
+
+    } else {
+      console.log('Invalid report selected');
+    }
+  } catch (error) {
+    console.error('Error occurred while fetching data:', error);
+  }
+};
 
 const handleSearchChange = (event) => {
   
-  // setFilterValue(prevData=>({
-  //   ...prevData,searchParam:event.target.value
-  // }))
+  setFilterValue(prevData=>({
+    ...prevData,searchParam:event.target.value
+  }))
 };
 
 const handleReset = () => {
-  // setFilterValue({
-  //   searchParam: '',
-  //   productType: '',
-  //   Status: ''
-  // });
+  setFilterValue({
+    searchParam: '',
+    productType: '',
+    Status: ''
+  });
+  GetInvoiceList();
 };
 const handleDropdownChange =(e,field)=>{
   const selectedValue=e.target.value;
-  // setFilterValue(prevData=>({
-  //   ...prevData,[field]:selectedValue
-  // })) 
+  setFilterValue(prevData=>({
+    ...prevData,[field]:selectedValue
+  })) 
 }
+const fetchData=async()=>{
+  const getstatus =      await   makeApiCall(Api_Endpoints.getStatus, 'GET');
+  
+  if(getstatus?.status===200){
+    const dropdownData = [
+     
+      {
+        label: "status",
+        placeholder: 'Select Status',
+        options: getstatus.data?.map((data) => ({
+          value: data.status_id, // Assuming your API response contains a 'value' field
+          label: data.name // Assuming your API response contains a 'label' field
+        }))
+      },
+      // Add more dropdown objects as needed
+    ];
+  setdropDownData(dropdownData)
+  
+  
+  
+  }else
+  {
+    showErrorToast(getstatus?.message)
+  }
+  
+    }
 
-useEffect(()=>{},[filterValue])
+
+    useEffect(()=>{fetchData()},[])
+useEffect(()=>{
+
+},[filterValue,invoiceList])
+
+
 
     return (
-      <div style={{height:'100%'}} className='InvoiceGenerationContainer'>
+      <div style={{height:'100%'}}>
       
      
         {/* <div className=" flex justify-center w-full p-8 mx md:w-[75%] max-w-[95%] bg-white lg:max-h-80 min-h-fit -mt-20 border border-neutral-light rounded mb-4 ">
           <LineChart />
         </div> */}
- 
- <FilterContainer
+
+
+
+      <FilterContainer
+      dropdownData={dropDownData}
         handleSearchChange={handleSearchChange}
         handleDropdownChange={handleDropdownChange}
         handleReset={handleReset}
         product={product}
+        handleFilterChange={handleFilterChange}
         status={status}
       />
 
- 
             <div className="flex gap-5">
               <h1 className="text-2xl font-bold mb-4">Invoice List</h1>
               {/* {!isMobile && (
@@ -307,8 +387,7 @@ useEffect(()=>{},[filterValue])
                 searchType={"policy"}
               />
             )} */}
-            {/* {isMobile ? ( */}
-            <InvoiceGenerationListPageTable data={poicyList} refresh={refreshpage} />
+<InvoiceGenerationListPageTable data={invoiceList} refresh={refreshpage} />
   
             <div style={{display:'flex',justifyContent:'space-between',marginRight:'10px',alignItems:'center'}}>
               <span style={{color:'black'}}>
@@ -342,3 +421,5 @@ onClick={() => handlePageChange(currentPage - 1)}
   }
 
 export default InvoiceGenerationListPage;
+
+

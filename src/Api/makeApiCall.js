@@ -32,7 +32,6 @@ export const makeApiCall = async (url, method, data = {}) => {
   };
 
   if (method === 'GET') {
-    console.log(data,'awsdasd')
     const queryParams = serializeToQueryParams({ ...DEFAULT_BODY_PARAMS, ...data });
     url += `?${queryParams}`;
   } else {

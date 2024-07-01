@@ -74,7 +74,7 @@
     font-size: 16px;
   }
   
-  button {
+  .loginbutton {
     border-radius: 5px;
     border: none;
     color: #fff;
@@ -88,13 +88,12 @@
     padding: 10px 0;
     transition: background 0.3s;
     width: 80%;
+    background: #fe2016;
+
   }
   
-  button.primary {
-    background: #f58733;
-  }
-  
-  button.primary:hover {
-    background: #ea6c0b;
+
+  .loginbutton:hover {
+    background: #8a0505;
   }
  

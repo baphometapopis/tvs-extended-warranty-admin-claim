@@ -15,7 +15,6 @@ const LoginPage = () => {
 
     const response = await makeApiCall(Api_Endpoints.login_Endpoint, 'POST', {Email:email,Password:password,Type:'admin' });
 
-      console.log(response)
     if (response.status===200) {
       showSuccessToast(response?.message)
 
@@ -55,7 +54,7 @@ const LoginPage = () => {
               placeholder="**********"
             />
           </div>
-          <button className="primary" type="submit">Submit</button>
+          <button className='loginbutton' type="submit">Submit</button>
         </form>
       </div>
     </div>

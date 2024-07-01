@@ -16,7 +16,6 @@ const SampleTree = (props) => {
   }
 
   function onNodeClick(nodeId) {
-    // console.log('d3', d3.event);
     alert('clicked ' + nodeId);
   }
 
