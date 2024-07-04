@@ -1,3 +1,5 @@
+/* eslint-disable no-unused-vars */
+
 import React, { useEffect, useState } from 'react'
 import { Api_Endpoints } from '../../Api/apiEndpoint'
 import { saveAs } from 'file-saver';
@@ -14,6 +16,9 @@ const [dropDownData,setdropDownData]=useState([])
 const [excelData,setExcelData]=useState('')
 const [state,setstate]=useState('')
 
+const [headers, setHeaders] = useState([]);
+const [rowCount, setRowCount] = useState(0);
+const [colCount, setColCount] = useState(0);
 
 
 const handleFilterChange = async (data) => {
@@ -147,7 +152,29 @@ const generateExcelFile = (exceldata) => {
 
 
 
+const handleFileUpload = (event) => {
+  const file = event.target.files[0];
+  const reader = new FileReader();
 
+  reader.onload = (e) => {
+    const data = new Uint8Array(e.target.result);
+    const workbook = XLSX.read(data, { type: 'array' });
+
+    const firstSheetName = workbook.SheetNames[0];
+    const worksheet = workbook.Sheets[firstSheetName];
+    const jsonSheet = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
+
+    const headers = jsonSheet[0];
+    const rowCount = jsonSheet.length;
+    const colCount = headers.length;
+
+    setHeaders(headers);
+    setRowCount(rowCount);
+    setColCount(colCount);
+  };
+
+  reader.readAsArrayBuffer(file);
+};
 
 
 const getColumnWidth = (ws, columnHeader) => {
@@ -248,10 +275,24 @@ setdropDownData(dropdownData)
         removeSearchBar={true}
 
       />  
-     {state&& <h3>Recent Downloaded Reports</h3>}
+<input type="file" accept=".xlsx, .xls" onChange={handleFileUpload} />
+      {headers.length > 0 && (
+        <div>
+          <h3>Headers</h3>
+          <ul>
+            {headers.map((header, index) => (
+              <li key={index}>{header}</li>
+            ))}
+          </ul>
+          <p>Number of Rows: {rowCount}</p>
+          <p>Number of Columns: {colCount}</p>
+        </div>
+      )}
+     {/* {state&& <h3>Recent Downloaded Reports</h3>} */}
 
-{state&&      <OutTable data={state?.rows} columns={state?.cols} tableClassName="ExcelTable2007" tableHeaderRowClass="heading" />
-}        </div>
+{/* {state&&      <OutTable data={state?.rows} columns={state?.cols} tableClassName="ExcelTable2007" tableHeaderRowClass="heading" />
+}   */}
+      </div>
   )
 }
 

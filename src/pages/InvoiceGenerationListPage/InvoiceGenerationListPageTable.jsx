@@ -276,8 +276,8 @@ const InvoiceGenerationListPageTable = ({ refresh,data }) => {
     }}
   >
      <InvoiceModalComponent 
-        // isOpen={isUtrModalOpen} 
-        isOpen={true} 
+        isOpen={isUtrModalOpen} 
+        // isOpen={true} 
 
         onClose={() => setIsUtrModalOpen(false)}
 

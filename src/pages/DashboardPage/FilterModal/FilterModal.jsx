@@ -69,11 +69,13 @@ const ModalComponent = ({ isOpen, onClose, applyFilters }) => {
   const handleApplyFilters = () => {
 
     const filterData = {
-      dealer_id: selectedDealer ?? '',
-      model_id: selectedModel ?? '',
-      city: selectedCity ?? '',
-      state: selectedState ?? ''
+      dealer_id: selectedDealer?.value ?? '',
+      model_id: selectedModel?.value ?? '',
+      city: selectedCity?.value ?? '',
+      state: selectedState?.value ?? ''
     };
+
+    console.log(filterData)
 
     setAppliedFilters([
       { label: 'Dealer ID', value: selectedDealer },
@@ -138,24 +140,24 @@ const ModalComponent = ({ isOpen, onClose, applyFilters }) => {
         </div> */}
         <div className="filter-dropdowns">
           <div className="dropdown-container">
-            <label htmlFor="dealer_id">Dealer ID</label>
+            <label htmlFor="dealer_id">Dealer Name</label>
             <Select
               options={dealerOptions}
               placeholder="Select Option"
               onChange={(selectedOption) => {
-                setSelectedDealer(selectedOption.value);
+                setSelectedDealer(selectedOption);
               }}
               styles={customStyles}
               value={selectedDealer}
             />
           </div>
           <div className="dropdown-container">
-            <label htmlFor="model_id">Model ID</label>
+            <label htmlFor="model_id">Model Name</label>
             <Select
               options={modelOptions}
               placeholder="Select Option"
               onChange={(selectedOption) => {
-                setSelectedModel(selectedOption.value);
+                setSelectedModel(selectedOption);
               }}
               styles={customStyles}
               value={selectedModel}
@@ -167,7 +169,7 @@ const ModalComponent = ({ isOpen, onClose, applyFilters }) => {
               options={stateOptions}
               placeholder="Select Option"
               onChange={(selectedOption) => {
-                setSelectedState(selectedOption.value);
+                setSelectedState(selectedOption);
                 getCities(selectedOption?.value);
               }}
               styles={customStyles}
@@ -180,7 +182,7 @@ const ModalComponent = ({ isOpen, onClose, applyFilters }) => {
               options={cityOptions}
               placeholder="Select Option"
               onChange={(selectedOption) => {
-                setSelectedCity(selectedOption.value);
+                setSelectedCity(selectedOption);
               }}
               styles={customStyles}
               value={selectedCity}

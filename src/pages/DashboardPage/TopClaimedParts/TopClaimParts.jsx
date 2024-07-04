@@ -40,7 +40,7 @@ const TopClaimParts = ({ topParts, filteredParts,appliedFiltered ,handleOpenModa
         const result = [];
     
         sortedTopParts.slice(0, 5).forEach((part, index) => {
-            const filteredPart = filteredParts.find(fp => fp.part_id === part.part_id);
+            const filteredPart = filteredParts?.find(fp => fp.part_id === part.part_id);
     
             if (filteredPart) {
                 result.push(
@@ -104,7 +104,7 @@ const TopClaimParts = ({ topParts, filteredParts,appliedFiltered ,handleOpenModa
 </div>
 
             {isFlipped
-                ? filteredParts.length === 0&& appliedFiltered===null
+                ? filteredParts?.length === 0&& appliedFiltered===null
                     ? renderEmptyContainers()
                     : renderFilteredParts()
                 : renderTopParts()}

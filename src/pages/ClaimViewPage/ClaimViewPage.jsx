@@ -1,3 +1,7 @@
+/* eslint-disable no-unused-vars */
+/* eslint-disable react-hooks/exhaustive-deps */
+
+
 import React, { useState } from 'react';
 import { useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
@@ -71,20 +75,7 @@ const [formData, setFormData] = useState({
   StatusId: ''
 });
 
-  const updatestatuslist=[
-    {
-      "id": 4,
-      "label": "Accept"
-  },
-  {
-      "id": 2,
-      "label": "Reject"
-  },
-  {
-      "id": 3,
-      "label": "ReferBack"
-  },
-]
+
 
   const [ogEstimation,setOgEstimation]=useState([])
   const [adminStatus,setAdminStatus]=useState([])
@@ -98,22 +89,16 @@ const [formData, setFormData] = useState({
 // ]
 
   const [estimations, setEstimations] = useState([]);
-  const [formErrors, setFormErrors] = useState({
-    proposal_no: '',
-    // Add other claim_details error fields here
-  });
+  const [formErrors, setFormErrors] = useState({});
   const [selectedTab, setSelectedTab] = useState('claim_details'); // Default tab is 'claim_details'
   const [isEditing, setIsEditing] = useState(null); // Track which row is being edited
   const [editedEstimations, setEditedEstimations] = useState([]); // Track the updated estimation data
-  const [clonedestimations, setClonedestimations] = useState([]); // Track the updated estimation data
 
   const [status, setStatus] = useState('');
-  const [error, setError] = useState('');
   const [adminComment, setadminComment] = useState('');
 
   const handleChangeText = (event) => {
     setadminComment(event.target.value);
-  setError('');
 };
 
   const handleChange = (e, field, index = null) => {
@@ -187,20 +172,10 @@ const [formData, setFormData] = useState({
 
   
   
-  const handleDropdownChange = async (event, field) => {
-    const selectedValue = event.target.value;
-    // Your handleDropdownChange logic
-  };
 
-  const DropDownOption = [
-    { value: 'option1', label: 'option1' },
-    { value: 'option2', label: 'option2' },
-    { value: 'option3', label: 'option3' },
-  ];
-
+ 
   const handleChangeStatus = (event) => {
     setStatus(event.target.value);
-    setError('');
   };
 
 
@@ -264,8 +239,7 @@ const [formData, setFormData] = useState({
   const getClaimData = async () => {
 
     const getstatus =      await   makeApiCall(Api_Endpoints.getStatus, 'GET');
-if(getstatus?.status===200){
-    setAdminStatus(getstatus?.data)}
+
 
     const response = await makeApiCall(Api_Endpoints.getClaimDetails, 'GET', { claim_id: ClaimNumber });
     const claimData = response?.data;
@@ -315,9 +289,64 @@ if(getstatus?.status===200){
       StatusId: claimData.StatusId
     });
     setAttachments({Services:claimData?.attachments??''})
+    let tempEstimation = claimData?.PartEstimation;
+let isAmountMismatched = false
+    if (tempEstimation && tempEstimation.length > 0) {
+      for (const estimationParts of tempEstimation) {
+        // Calculation: BasePrice + (BasePrice * (GST / 100))
+        let mrp = estimationParts?.mrp || 0;
+        let mrpGST = estimationParts?.tax_rate / 100 || 0;
+        let PartsTotal = mrp + (mrp * mrpGST);
     
+        let labour_charge = estimationParts?.labour_charge || 0;
+        let labour_gst = estimationParts?.labour_gst / 100 || 0;
+        let labourTotal = labour_charge + (labour_charge * labour_gst);
+    
+        let CalculatedTotalMRP = PartsTotal + labourTotal;
+    
+        // Round TotalMRP to 2 decimal places
+        let roundedTotalMRP = parseFloat(CalculatedTotalMRP.toFixed(2));
+    
+        // Check if the rounded TotalMRP matches the total_mrp in estimationParts
+        estimationParts.CalculatedTotalMRP=CalculatedTotalMRP
+        if (roundedTotalMRP === estimationParts?.total_mrp) {
+          estimationParts.amountMatched = true;
+        } else {
+          estimationParts.amountMatched = false;
+          console.log(roundedTotalMRP, "does not match", estimationParts?.total_mrp);
+          isAmountMismatched = true
+        }
+      }
+    
+      // Update tempEstimation in claimData
+      claimData.PartEstimation = tempEstimation;
+    }
 
-    setOgEstimation(claimData?.PartEstimation)
+    if(getstatus?.status===200){
+
+      let filteredData = getstatus?.data.filter(status => 
+        status.status_id !== 1 && status.status_id !== 5
+      );
+
+      if(isAmountMismatched){
+
+         filteredData = filteredData.filter(status => status.status_id !== 2);
+
+
+
+    
+    }
+
+    setAdminStatus(filteredData)}
+
+    else{
+      showErrorToast(getstatus?.message)
+    }
+    
+    
+    setOgEstimation(claimData.PartEstimation)
+
+
     setEstimations(claimData?.PartEstimation)
 }else{
   showErrorToast(response?.message)
@@ -329,7 +358,10 @@ if(getstatus?.status===200){
 useEffect(()=>{getClaimData();
 },[])
 
-  useEffect(()=>{},[estimations])
+  useEffect(()=>{
+
+
+  },[estimations])
   return (
     <div className='ClaimViewContainer'>
       <div className='Tabs'>
@@ -467,7 +499,7 @@ useEffect(()=>{getClaimData();
             label="Registartion Date"
             name="RegistrationDate"
             required={true}
-            value={formData.registration_date}
+            value={formData.RegistrationDate}
             onChange={(e) => handleChange(e, 'RegistrationDate')}
             placeholder="Enter Registration Date"
             error={formErrors.RegistrationDate} 
@@ -663,13 +695,14 @@ useEffect(()=>{getClaimData();
 
               {isEditing === index ? (
                 <>
+
                   <TextInput
                     name="category"
                     value={estimation.part_description}
                     onChange={(e) => handleChange(e, 'part_description', index)}
                     placeholder="Enter Category"
                     error={formErrors.part_description}
-                    isDisabled={false}
+                    isDisabled={true}
                   />
                   <div className='PlainText'>{estimation.hsn_code}</div>
                   <TextInput
@@ -678,7 +711,7 @@ useEffect(()=>{getClaimData();
                     onChange={(e) => handleChange(e, 'model', index)}
                     placeholder="Enter Model"
                     error={formErrors.model}
-                    isDisabled={false}
+                    isDisabled={true}
                   />
                   <TextInput
                     name="mrp"
@@ -686,7 +719,7 @@ useEffect(()=>{getClaimData();
                     onChange={(e) => handleChange(e, 'mrp', index)}
                     placeholder="Enter Unit Price"
                     error={formErrors.mrp}
-                    isDisabled={false}
+                    isDisabled={true}
                   />
                 
                   <TextInput
@@ -695,7 +728,7 @@ useEffect(()=>{getClaimData();
                     onChange={(e) => handleChange(e, 'tax_rate', index)}
                     placeholder="Enter GST"
                     error={formErrors.tax_rate}
-                    isDisabled={false}
+                    isDisabled={true}
                   />
                    <TextInput
                     name="labour_charge"
@@ -711,7 +744,7 @@ useEffect(()=>{getClaimData();
                     onChange={(e) => handleChange(e, 'labour_gst', index)}
                     placeholder="Enter Labour GST"
                     error={formErrors.labour_gst}
-                    isDisabled={false}
+                    isDisabled={true}
                   />
                   <TextInput
                     name="total_mrp"
@@ -719,14 +752,13 @@ useEffect(()=>{getClaimData();
                     onChange={(e) => handleChange(e, 'total_mrp', index)}
                     placeholder="Enter Total"
                     error={formErrors.total_mrp}
-                    isDisabled={false}
+                    isDisabled={true}
                   />
 
                   <button style={{backgroundColor:'green'}} onClick={() => handleUpdateClick(index,)}>Update</button>
                 </>
               ) : (
                 <>
-
                   <TextInput
                     name="part_description"
                     value={estimation.part_description}
@@ -782,11 +814,13 @@ useEffect(()=>{getClaimData();
                     value={estimation.total_mrp}
                     onChange={(e) => handleChange(e, 'total_mrp', index)}
                     placeholder="Enter Total"
-                    error={formErrors.total_mrp}
+                    error={estimation.amountMatched===false?`Amount Mismatched -  Calculated ${estimation?.CalculatedTotalMRP}`:''}
                     isDisabled={true}
                   />
-<img onClick={() => handleEditClick(index)} src={EditIcon} style={{width:'25px',height:'25px',position:'absolute',right:5,top:0}}/>
+              {/* {estimation.amountMatched===false&& <p>Amount Mismatched{estimation.amountMatched}</p> } */}
 
+{estimation.amountMatched===true&& <img onClick={() => handleEditClick(index)} alt='edit Icon' src={EditIcon} style={{width:'25px',height:'25px',position:'absolute',right:5,top:0}}/>
+}
                 </>
               )}
             </div>
@@ -807,8 +841,8 @@ useEffect(()=>{getClaimData();
 <span>{fileKey === 'firstServiceFile' ? 'First Service' : fileKey === 'secondServiceFile' ? 'Second Service' : fileKey === 'thirdServiceFile' ? 'Third Service':fileKey}</span>
                 {fileValue ? (
                   <div>
-                    <img  style={{width:'30px',cursor:'pointer',marginRight:'15px'}} src={ViewIcon} />
-   <img  src={Downloadpdf}  style={{width:'30px',cursor:'pointer'}}  />
+                    <img  alt= 'View Icon' style={{width:'30px',cursor:'pointer',marginRight:'15px'}} src={ViewIcon} />
+   <img  src={Downloadpdf} alt='Download Icon'  style={{width:'30px',cursor:'pointer'}}  />
 
                    
                   </div>
@@ -909,7 +943,7 @@ useEffect(()=>{getClaimData();
                     error={formErrors.total_mrp}
                     isDisabled={true}
                   />
-<img onClick={() => handleCancelEdit(index)} src={CloseIcon} style={{width:'25px',height:'25px',position:'absolute',right:5,top:0}}/>
+<img onClick={() => handleCancelEdit(index)}  alt='cancel icon'src={CloseIcon} style={{width:'25px',height:'25px',position:'absolute',right:5,top:0}}/>
 
                 </>
             

@@ -106,8 +106,9 @@ useEffect(()=>{},[bankList])
               <p>Invoice Month: {data?.invoiceMonth}</p>
             </div> */}
           </div>
+          {/* {console.log(data?.invoiceDetails[0]?.utr_number==='')} */}
           <div className="utr-section">
-            {data?.invoiceDetails[0]?.utr_number==='' ? (
+            {data?.invoiceDetails[0]?.utr_number!=='' ? (
               <div style={{display:'flex',justifyContent:'space-between',width:'100%'}}>
                 <div>
               <p> <strong> Payment Bank:</strong> {data?.invoiceDetails[0]?.payment_bank}</p>
