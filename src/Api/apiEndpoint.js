@@ -1,5 +1,5 @@
-export const url = 'http://localhost:7781/api/v1'; //demo
-// export const url = 'http://103.193.75.198:8881/api/v1'; //live
+// export const url = 'http://localhost:7781/api/v1'; //demo
+export const url = 'http://103.193.75.198:8881/api/v1'; //live
 
 export const Api_Endpoints = {
   login_Endpoint: `${url}/login`,
