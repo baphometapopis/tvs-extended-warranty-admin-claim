@@ -19,7 +19,7 @@ const AppLayout = ({ children }) => {
 
       <Header toggleSidebar={toggleSidebar} />
       <div className="content">
-        <Sidebar isOpen={isSidebarOpen} />
+        <Sidebar isOpen={true} />
         <main className="main">{children}</main>
       </div>
     </div>

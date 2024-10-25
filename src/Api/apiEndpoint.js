@@ -1,5 +1,10 @@
 // export const url = 'http://localhost:7781/api/v1'; //demo
 export const url = 'http://103.193.75.198:8881/api/v1'; //live
+// http://103.193.75.198:8882/api/v1/new_pdf/PL174b934308e-8a
+// export const url = '/api/';
+// export const url1 = '/api/';
+
+
 
 export const Api_Endpoints = {
   login_Endpoint: `${url}/login`,
@@ -13,7 +18,11 @@ export const Api_Endpoints = {
   getModel: `${url}/admin/model`,
   getState: `${url}/admin/states`,
   getCity: `${url}/admin/city`,
-  getPdf: `${url}/get_pdf`,
+  getPdf: `http://103.193.75.198:8882/api/v1/new_pdf`,
+
+
+  // export const url = 'http://103.193.75.198:8881/api/v1'; //live
+
   getStatus: `${url}/admin/status`,
   updateStatus: `${url}/admin/update_claim_status`,
   updateEstimation: `${url}/admin/update_claim_estimation`,
@@ -21,4 +30,6 @@ export const Api_Endpoints = {
   updateUTR: `${url}/admin/update_utr`,
   getBankList: `${url}/admin/bank_list`,
   getDealerList: `${url}/admin/dealer_list`,
+  getAttachment: `${url}/admin/get_claims_file`,
+
 };

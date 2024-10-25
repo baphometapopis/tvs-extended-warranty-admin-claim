@@ -32,7 +32,7 @@ const   getLocalData =()=>{
   
   return (
     <header className="app-header">
-    { isMobile && <div className="menu-icon" onClick={toggleSidebar}>
+    { false && <div className="menu-icon" onClick={toggleSidebar}>
     <img src={Logo}  alt='Menu' style={{height:'40px',width:'50px'}}/>      
       </div>}
       <div className="logo">

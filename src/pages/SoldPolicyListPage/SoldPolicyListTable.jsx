@@ -16,7 +16,7 @@ const SoldPolicyListTable = ({ data, refresh }) => {
 
     const handleDownloadPdf = async (data) => {
     
-      const response = await makeApiCall(`${url}/get_pdf/${data?.policyNumber}`, 'GET');
+      const response = await makeApiCall(`http://103.193.75.198:8882/api/v1/new_pdf/${data?.policyNumber}`, 'POST');
       if (response?.status===200) {
         const base64String = response?.data;
         const fileName = `${data?.policyNumber}_SoldPolicy.pdf`;

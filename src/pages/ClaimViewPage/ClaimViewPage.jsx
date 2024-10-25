@@ -12,6 +12,7 @@ import TextInput from '../../components/UI/TextInput';
 import { CloseIcon, Downloadpdf, EditIcon, ViewIcon } from '../../Constant/ImageConstant';
 import { showErrorToast, showSuccessToast } from '../../utils/toastService';
 import './ClaimViewPage.css';
+import ImageModal from './ImageModal';
 
 export const ClaimViewPage = () => {
 const data = useLocation()
@@ -188,7 +189,7 @@ const [formData, setFormData] = useState({
       for (const estimation of editedEstimations) {
         const updateEstimation = {
           claim_id: formData?.claim_id,
-          part_estimatiom: {
+          part_estimation: {
             id: estimation.id,
             claim_id: estimation?.claim_id,
             customer_id: estimation.customer_id,
@@ -289,6 +290,10 @@ const [formData, setFormData] = useState({
       StatusId: claimData.StatusId
     });
     setAttachments({Services:claimData?.attachments??''})
+    
+
+
+
     let tempEstimation = claimData?.PartEstimation;
 let isAmountMismatched = false
     if (tempEstimation && tempEstimation.length > 0) {
@@ -328,14 +333,7 @@ let isAmountMismatched = false
         status.status_id !== 1 && status.status_id !== 5
       );
 
-      if(isAmountMismatched){
-
-         filteredData = filteredData.filter(status => status.status_id !== 2);
-
-
-
-    
-    }
+     
 
     setAdminStatus(filteredData)}
 
@@ -353,6 +351,42 @@ let isAmountMismatched = false
 
 }
   };
+
+
+
+  const downloadImage = (url) => {
+    fetch(url)
+        .then((response) => {
+            if (!response.ok) throw new Error('Network response was not ok');
+            return response.blob();
+        })
+        .then((blob) => {
+            const link = document.createElement('a');
+            link.href = window.URL.createObjectURL(blob);
+            link.download = url.split('/').pop(); // Use the last part of the URL as the filename
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            window.URL.revokeObjectURL(link.href); // Clean up the URL.createObjectURL
+        })
+        .catch((error) => {
+            console.error('There was a problem with the fetch operation:', error);
+        });
+};
+
+
+
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [imageUrl, setImageUrl] = useState('');
+
+    const showModal = (url) => {
+        setImageUrl(url);
+        setIsModalOpen(true);
+    };
+
+    const handleClose = () => {
+        setIsModalOpen(false);
+    };
 
 
 useEffect(()=>{getClaimData();
@@ -814,13 +848,15 @@ useEffect(()=>{getClaimData();
                     value={estimation.total_mrp}
                     onChange={(e) => handleChange(e, 'total_mrp', index)}
                     placeholder="Enter Total"
-                    error={estimation.amountMatched===false?`Amount Mismatched -  Calculated ${estimation?.CalculatedTotalMRP}`:''}
+                    // error={estimation.amountMatched===false?`Amount Mismatched -  Calculated ${Math.round(estimation?.CalculatedTotalMRP)}`:''}
                     isDisabled={true}
                   />
               {/* {estimation.amountMatched===false&& <p>Amount Mismatched{estimation.amountMatched}</p> } */}
 
-{estimation.amountMatched===true&& <img onClick={() => handleEditClick(index)} alt='edit Icon' src={EditIcon} style={{width:'25px',height:'25px',position:'absolute',right:5,top:0}}/>
-}
+{/* {estimation.amountMatched===true&& <img onClick={() => handleEditClick(index)} alt='edit Icon' src={EditIcon} style={{width:'25px',height:'25px',position:'absolute',right:5,top:0}}/>
+} */}
+<img onClick={() => handleEditClick(index)} alt='edit Icon' src={EditIcon} style={{width:'25px',height:'25px',position:'absolute',right:5,top:0}}/>
+
                 </>
               )}
             </div>
@@ -831,7 +867,7 @@ useEffect(()=>{getClaimData();
       )}
 
 {selectedTab === 'claim_attachments' && ( <div className="attachment-container">
-  {console.log(attachments)}
+  {console.log(attachments,'khgjkh kjh khj')}
       {Object.entries(attachments)?.map(([category, files], index) => (
         <div key={index} className="category-section">
           <h2>{category}</h2>
@@ -841,8 +877,8 @@ useEffect(()=>{getClaimData();
 <span>{fileKey === 'firstServiceFile' ? 'First Service' : fileKey === 'secondServiceFile' ? 'Second Service' : fileKey === 'thirdServiceFile' ? 'Third Service':fileKey}</span>
                 {fileValue ? (
                   <div>
-                    <img  alt= 'View Icon' style={{width:'30px',cursor:'pointer',marginRight:'15px'}} src={ViewIcon} />
-   <img  src={Downloadpdf} alt='Download Icon'  style={{width:'30px',cursor:'pointer'}}  />
+                    <img   onClick={()=>showModal(fileValue)} alt= 'View Icon' style={{width:'30px',cursor:'pointer',marginRight:'15px'}} src={ViewIcon} />
+   <img  onClick={()=>downloadImage(fileValue)}  src={Downloadpdf} alt='Download Icon'  style={{width:'30px',cursor:'pointer'}}  />
 
                    
                   </div>
@@ -854,7 +890,53 @@ useEffect(()=>{getClaimData();
           </ul>
         </div>
       ))}
+
+
+      {/* <p>Parts Attachments</p> */}
+
+
+      <div className="category-section">
+    <h2>Parts Attachments</h2>
+    <ul className="attachment-list">
+      {estimations.map((estimation, index) => (
+        <li key={estimation.id} className="attachment-item">
+          <h3>{estimation.part_description}</h3>
+          {/* Render images from image1 to image5 */}
+          {[...Array(5)].map((_, imageIndex) => {
+            const imageKey = `image${imageIndex + 1}`;
+            const imageValue = estimation[imageKey];
+            return (
+              <div key={imageIndex}>
+                {imageValue ? (
+                  <div>
+                    <img
+                      onClick={() => showModal(imageValue)}
+                      alt="View Icon"
+                      style={{ width: '30px', cursor: 'pointer', marginRight: '15px' }}
+                      src={ViewIcon}
+                    />
+                    <img
+                      onClick={() => downloadImage(imageValue)}
+                      src={Downloadpdf}
+                      alt="Download Icon"
+                      style={{ width: '30px', cursor: 'pointer' }}
+                    />
+                  </div>
+                ) : (
+                  <span className="not-available">Not Available</span>
+                )}
+              </div>
+            );
+          })}
+        </li>
+      ))}
+    </ul>
+  </div>
+
     </div>)}
+
+
+
       {selectedTab === 'status' && (
         <div className='UpdateStatus'>
            <Dropdown
@@ -955,6 +1037,11 @@ useEffect(()=>{getClaimData();
         </div>
 
       )}
+       <ImageModal
+                isOpen={isModalOpen}
+                onRequestClose={handleClose}
+                imageUrl={imageUrl}
+            />
     </div>
   );
 };

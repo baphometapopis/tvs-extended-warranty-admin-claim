@@ -3,8 +3,8 @@ import { getUserSession } from "../utils/auth";
 const baseUrl = process.env.REACT_APP_BASE_URL;
 const user_data=getUserSession()
 const AUTH_TOKEN = user_data?.loginUserData?.Token
-const DEFAULT_BODY_PARAMS = { BusinessPartnerId:user_data?.loginUserData?.BusinessPartnerId ,RoleId:user_data?.loginUserData?.RoleId};
-
+// const DEFAULT_BODY_PARAMS = { BusinessPartnerId:user_data?.loginUserData?.BusinessPartnerId ,RoleId:user_data?.loginUserData?.RoleId};
+const DEFAULT_BODY_PARAMS={}
 const serializeToQueryParams = (obj) => {
   const str = [];
   for (const p in obj) {

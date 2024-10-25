@@ -238,7 +238,7 @@ if(getstatus?.status===200){
       options: [
         { value: "sold_policy", label: "Sold Policy" },
         { value: "claim", label: "Claim" },
-        { value: "invoices", label: "Invoices" }
+        { value: "invoices", label: "Claim Invoices" }
       ]
     },
     {
@@ -275,7 +275,7 @@ setdropDownData(dropdownData)
         removeSearchBar={true}
 
       />  
-<input type="file" accept=".xlsx, .xls" onChange={handleFileUpload} />
+{/* <input type="file" accept=".xlsx, .xls" onChange={handleFileUpload} /> */}
       {headers.length > 0 && (
         <div>
           <h3>Headers</h3>

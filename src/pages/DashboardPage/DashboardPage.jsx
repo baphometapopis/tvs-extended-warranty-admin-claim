@@ -133,11 +133,11 @@ if(response?.status===200){
             
                 </div>
 
-                <p style={{fontSize:'44px',margin:'0px',color:'white',fontWeight:'bold'}}>
+                <p style={{fontSize:'35px',margin:'0px',color:'white',fontWeight:'bold'}}>
             {Dashboardcounts?.avg_claimCount_tat}
             <span style={{fontSize:'20px',marginLeft:'5px',color:'white',fontWeight:'normal'}}>days</span>
           </p>
-                        <p style={{fontSize:'16px',margin:'0px',color:'white'}}>Average Claim TAT </p>
+                        <p style={{fontSize:'16px',margin:'0px',color:'white',textAlign:'center'}}>Average Claim TAT </p>
 
     
 
@@ -153,8 +153,8 @@ if(response?.status===200){
                 <div className='avgclaim-container1'>
                 <img src={AvgClaimIcon} style={{height:'40px',width:'40px',margin:' 5px 15px '}}/>
                 </div>
-            <p style={{fontSize:'44px',margin:'0px',color:'white',fontWeight:'bold'}}>{formatAmount(Dashboardcounts?.highest_claim_size)}</p>
-            <p style={{fontSize:'16px',margin:'0px',color:'white'}}>Total  Claimed Amount </p>
+            <p style={{fontSize:'35px',margin:'0px',color:'white',fontWeight:'bold'}}>{formatAmount(Dashboardcounts?.highest_claim_size)}</p>
+            <p style={{fontSize:'16px',margin:'0px',color:'white',textAlign:'center'}}>Total  Claimed Amount </p>
 
 
           </div>}
